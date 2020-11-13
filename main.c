@@ -79,7 +79,6 @@ void MoveEnemies();
 Hero hero;
 Shoot heroShoot;
 bool moveEnemiesToLeft = true;
-bool updateEnemies = true;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
@@ -94,7 +93,6 @@ int main() {
         ExecuteGameLoop();
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
     CloseWindow();
@@ -213,9 +211,10 @@ void UpdateGame()
         // collides with an enemy or "collides" with the end of the screen
         if (heroShoot.rec.y < 0) {
             heroShoot.active = false;
+        } else
+        {
+            CheckEnemyCollision();
         }
-
-        CheckEnemyCollision();
     }
 
     MoveEnemies();
@@ -223,27 +222,24 @@ void UpdateGame()
 
 void RenderSpaceInvaders()
 {
-    if (updateEnemies)
-    {
-        for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-            if (octopus[i].active) DrawRectangleRec(octopus[i].rec, octopus[i].color);
-        }
+    for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
+        if (octopus[i].active) DrawRectangleRec(octopus[i].rec, octopus[i].color);
+    }
 
-        for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-            if (crabFirstLine[i].active) DrawRectangleRec(crabFirstLine[i].rec, crabFirstLine[i].color);
-        }
+    for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
+        if (crabFirstLine[i].active) DrawRectangleRec(crabFirstLine[i].rec, crabFirstLine[i].color);
+    }
 
-        for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-            if (crabSecondLine[i].active) DrawRectangleRec(crabSecondLine[i].rec, crabSecondLine[i].color);
-        }
+    for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
+        if (crabSecondLine[i].active) DrawRectangleRec(crabSecondLine[i].rec, crabSecondLine[i].color);
+    }
 
-        for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-            if (squidFirstLine[i].active) DrawRectangleRec(squidFirstLine[i].rec, squidFirstLine[i].color);
-        }
+    for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
+        if (squidFirstLine[i].active) DrawRectangleRec(squidFirstLine[i].rec, squidFirstLine[i].color);
+    }
 
-        for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-            if (squidSecondLine[i].active) DrawRectangleRec(squidSecondLine[i].rec, squidSecondLine[i].color);
-        }
+    for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
+        if (squidSecondLine[i].active) DrawRectangleRec(squidSecondLine[i].rec, squidSecondLine[i].color);
     }
 
     if (heroShoot.active)
