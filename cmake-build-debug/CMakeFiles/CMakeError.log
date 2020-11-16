@@ -1,9 +1,9 @@
 Performing C SOURCE FILE Test COMPILER_HAS_THOSE_TOGGLES failed with the following output:
 Change Dir: C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):nmake /nologo cmTC_e02a1\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_e02a1.dir\build.make /nologo -L                  CMakeFiles\cmTC_e02a1.dir\build
-Building C object CMakeFiles/cmTC_e02a1.dir/src.c.obj
-	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm230F.tmp
+Run Build Command(s):nmake /nologo cmTC_a21ee\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_a21ee.dir\build.make /nologo -L                  CMakeFiles\cmTC_a21ee.dir\build
+Building C object CMakeFiles/cmTC_a21ee.dir/src.c.obj
+	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm9503.tmp
 cl : Command line error D8021 : invalid numeric argument '/Werror=pointer-arith'
 NMAKE : fatal error U1077: 'C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe' : return code '0x2'
 Stop.
@@ -16,54 +16,11 @@ int main(void) { return 0; }
 Determining if the include file pthread.h exists failed with the following output:
 Change Dir: C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):nmake /nologo cmTC_4b4ca\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_4b4ca.dir\build.make /nologo -L                  CMakeFiles\cmTC_4b4ca.dir\build
-Building C object CMakeFiles/cmTC_4b4ca.dir/CheckIncludeFile.c.obj
-	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm24A6.tmp
+Run Build Command(s):nmake /nologo cmTC_8804c\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_8804c.dir\build.make /nologo -L                  CMakeFiles\cmTC_8804c.dir\build
+Building C object CMakeFiles/cmTC_8804c.dir/CheckIncludeFile.c.obj
+	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm95ED.tmp
 CheckIncludeFile.c
 C:\Users\diego\CLionProjects\SpaceInvaders\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
-NMAKE : fatal error U1077: 'C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe' : return code '0x2'
-Stop.
-NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"' : return code '0x2'
-Stop.
-
-
-
-Determining if the CLOCK_MONOTONIC exist failed with the following output:
-Change Dir: C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/CMakeTmp
-
-Run Build Command(s):nmake /nologo cmTC_a91b8\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_a91b8.dir\build.make /nologo -L                  CMakeFiles\cmTC_a91b8.dir\build
-Building C object CMakeFiles/cmTC_a91b8.dir/CheckSymbolExists.c.obj
-	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm3819.tmp
-CheckSymbolExists.c
-C:\Users\diego\CLionProjects\SpaceInvaders\cmake-build-debug\CMakeFiles\CMakeTmp\CheckSymbolExists.c(8): error C2065: 'CLOCK_MONOTONIC': undeclared identifier
-NMAKE : fatal error U1077: 'C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe' : return code '0x2'
-Stop.
-NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"' : return code '0x2'
-Stop.
-
-
-File C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
-/* */
-#include <time.h>
-
-int main(int argc, char** argv)
-{
-  (void)argv;
-#ifndef CLOCK_MONOTONIC
-  return ((int*)(&CLOCK_MONOTONIC))[argc];
-#else
-  (void)argc;
-  return 0;
-#endif
-}
-Determining if the include file stdatomic.h exists failed with the following output:
-Change Dir: C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/CMakeTmp
-
-Run Build Command(s):nmake /nologo cmTC_78d74\fast && 	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"  -f CMakeFiles\cmTC_78d74.dir\build.make /nologo -L                  CMakeFiles\cmTC_78d74.dir\build
-Building C object CMakeFiles/cmTC_78d74.dir/CheckIncludeFile.c.obj
-	C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe @C:\Users\diego\AppData\Local\Temp\nm3C20.tmp
-CheckIncludeFile.c
-C:\Users\diego\CLionProjects\SpaceInvaders\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1): fatal error C1083: Cannot open include file: 'stdatomic.h': No such file or directory
 NMAKE : fatal error U1077: 'C:\PROGRA~2\MICROS~3\2019\COMMUN~1\VC\Tools\MSVC\1425~1.286\bin\Hostx86\x86\cl.exe' : return code '0x2'
 Stop.
 NMAKE : fatal error U1077: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86\nmake.exe"' : return code '0x2'
