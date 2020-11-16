@@ -15,6 +15,7 @@
 typedef struct Hero {
     Rectangle rec;
     Vector2 speed;
+    int score;
 } Hero;
 
 typedef struct Shoot {
@@ -24,32 +25,15 @@ typedef struct Shoot {
     Color color;
 } Shoot;
 
-typedef struct Octopus {
-    Rectangle rec;
+typedef struct Invader {
+    Texture2D sprite;
+    Rectangle bounds;
+    Vector2 pos;
     Vector2 speed;
     bool active;
     Color color;
     int value;
-    int index;
-} Octopus;
-
-typedef struct Crab {
-    Rectangle rec;
-    Vector2 speed;
-    bool active;
-    Color color;
-    int value;
-    int index;
-} Crab;
-
-typedef struct Squid {
-    Rectangle rec;
-    Vector2 speed;
-    bool active;
-    Color color;
-    int value;
-    int index;
-} Squid;
+} Invader;
 
 typedef struct EnemyShip {
     Rectangle rec;
@@ -58,11 +42,11 @@ typedef struct EnemyShip {
     int value;
 } EnemyShip;
 
-Octopus octopus[ENEMIES_PER_LINE] = { 0 };
-Crab crabFirstLine[ENEMIES_PER_LINE] = { 0 };
-Crab crabSecondLine[ENEMIES_PER_LINE] = { 0 };
-Squid squidFirstLine[ENEMIES_PER_LINE] = { 0 };
-Squid squidSecondLine[ENEMIES_PER_LINE] = { 0 };
+Invader octopus[ENEMIES_PER_LINE] = { 0 };
+Invader crabFirstLine[ENEMIES_PER_LINE] = { 0 };
+Invader crabSecondLine[ENEMIES_PER_LINE] = { 0 };
+Invader squidFirstLine[ENEMIES_PER_LINE] = { 0 };
+Invader squidSecondLine[ENEMIES_PER_LINE] = { 0 };
 
 const int screenWidth = 1400;
 const int screenHeight = 900;
@@ -108,6 +92,7 @@ void InitGame()
     hero.rec.width = HERO_WIDTH;
     hero.rec.x = (float)screenWidth / 2;
     hero.rec.y = (float)screenHeight - HERO_HEIGHT - 5;
+    hero.score = 0;
 
     // Init hero shoot
     heroShoot.color = RED;
@@ -119,69 +104,82 @@ void InitGame()
     int screenOffset = 100;
     int lineNumber = 0;
 
+    Texture2D octopusTexture = LoadTexture("resources/Octopus.png");
+
     // Init Octopus array
-    Octopus defaultOctopus = {
+    Invader defaultOctopus = {
         .active = true,
         .color = PINK,
         .speed = { .x = 1.f, .y = (float) ENEMY_HEIGHT / 2 },
-        .rec = { .height = ENEMY_HEIGHT, .width = ENEMY_WIDTH },
+        .sprite = octopusTexture,
+        .bounds = { .height = 65, .width = 75 },
         .value = 30
     };
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         octopus[i] = defaultOctopus;
-        octopus[i].index = i;
-        octopus[i].rec.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        octopus[i].pos.x = ENEMY_WIDTH + screenOffset * (i + 1);
+        octopus[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
     }
     lineNumber++;
 
+    Texture2D crabTexture = LoadTexture("resources/Crab.png");
+
     // Init Crab array
-    Crab defaultCrab = {
+    Invader defaultCrab = {
         .active = true,
         .color = SKYBLUE,
         .speed = { .x = 1.f, .y = (float) ENEMY_HEIGHT / 2 },
-        .rec = { .height = ENEMY_HEIGHT, .width = ENEMY_WIDTH },
-        .value = 30
+        .sprite = crabTexture,
+        .bounds = { .height = 65, .width = 75 },
+        .value = 20
     };
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         crabFirstLine[i] = defaultCrab;
-        crabFirstLine[i].index = i;
-        crabFirstLine[i].rec.x = ENEMY_WIDTH + screenOffset * ( i + 1);
-        crabFirstLine[i].rec.y = ENEMY_HEIGHT * lineNumber * 2;
+        crabFirstLine[i].pos.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        crabFirstLine[i].pos.y = ENEMY_HEIGHT * lineNumber * 2;
+        crabFirstLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        crabFirstLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 2;
     }
     lineNumber++;
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         crabSecondLine[i] = defaultCrab;
-        crabSecondLine[i].index = i;
-        crabSecondLine[i].rec.x = ENEMY_WIDTH + screenOffset * ( i + 1);
-        crabSecondLine[i].rec.y = ENEMY_HEIGHT * lineNumber * 2;
+        crabSecondLine[i].pos.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        crabSecondLine[i].pos.y = ENEMY_HEIGHT * lineNumber * 2;
+        crabSecondLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        crabSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 2;
     }
     lineNumber++;
 
+    Texture2D squidTexture = LoadTexture("resources/Squid.png");
+
     // Init Squid array
-    Squid defaultSquid = {
+    Invader defaultSquid = {
         .active = true,
         .color = GREEN,
         .speed = { .x = 1.f, .y = (float) ENEMY_HEIGHT / 2 },
-        .rec = { .height = ENEMY_HEIGHT, .width = ENEMY_WIDTH },
-        .value = 30
+        .sprite = squidTexture,
+        .bounds = { .height = 65, .width = 75 },
+        .value = 10
     };
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         squidFirstLine[i] = defaultSquid;
-        squidFirstLine[i].index = i;
-        squidFirstLine[i].rec.x = ENEMY_WIDTH + screenOffset * ( i + 1);
-        squidFirstLine[i].rec.y = ENEMY_HEIGHT * lineNumber * 2;
+        squidFirstLine[i].pos.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        squidFirstLine[i].pos.y = ENEMY_HEIGHT * lineNumber * 2;
+        squidFirstLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        squidFirstLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 2;
     }
     lineNumber++;
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         squidSecondLine[i] = defaultSquid;
-        squidSecondLine[i].index = i;
-        squidSecondLine[i].rec.x = ENEMY_WIDTH + screenOffset * ( i + 1);
-        squidSecondLine[i].rec.y = ENEMY_HEIGHT * lineNumber * 2;
+        squidSecondLine[i].pos.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        squidSecondLine[i].pos.y = ENEMY_HEIGHT * lineNumber * 2;
+        squidSecondLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
+        squidSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 2;
     }
 
     SetTargetFPS(60);
@@ -220,26 +218,27 @@ void UpdateGame()
     MoveEnemies();
 }
 
-void RenderSpaceInvaders()
+void RenderSpaceInvaders(int algo)
 {
+    DrawText(TextFormat("Score: %d", hero.score), 10, 25, 12, GREEN);
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (octopus[i].active) DrawRectangleRec(octopus[i].rec, octopus[i].color);
+        if (octopus[i].active) DrawTexture(octopus[i].sprite, octopus[i].bounds.x, octopus[i].bounds.y , octopus[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (crabFirstLine[i].active) DrawRectangleRec(crabFirstLine[i].rec, crabFirstLine[i].color);
+        if (crabFirstLine[i].active) DrawTexture(crabFirstLine[i].sprite, crabFirstLine[i].bounds.x, crabFirstLine[i].bounds.y, crabFirstLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (crabSecondLine[i].active) DrawRectangleRec(crabSecondLine[i].rec, crabSecondLine[i].color);
+        if (crabSecondLine[i].active) DrawTexture(crabSecondLine[i].sprite, crabSecondLine[i].bounds.x, crabSecondLine[i].bounds.y, crabSecondLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (squidFirstLine[i].active) DrawRectangleRec(squidFirstLine[i].rec, squidFirstLine[i].color);
+        if (squidFirstLine[i].active) DrawTexture(squidFirstLine[i].sprite, squidFirstLine[i].bounds.x, squidFirstLine[i].bounds.y, squidFirstLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (squidSecondLine[i].active) DrawRectangleRec(squidSecondLine[i].rec, squidSecondLine[i].color);
+        if (squidSecondLine[i].active) DrawTexture(squidSecondLine[i].sprite, squidSecondLine[i].bounds.x, squidSecondLine[i].bounds.y, squidSecondLine[i].color);
     }
 
     if (heroShoot.active)
@@ -269,46 +268,51 @@ void CheckEnemyCollision()
 {
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (octopus[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, octopus[i].rec))
+            if (CheckCollisionRecs(heroShoot.rec, octopus[i].bounds))
             {
                 heroShoot.active = false;
                 octopus[i].active = false;
+                hero.score += octopus[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (crabFirstLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, crabFirstLine[i].rec))
+            if (CheckCollisionRecs(heroShoot.rec, crabFirstLine[i].bounds))
             {
                 heroShoot.active = false;
                 crabFirstLine[i].active = false;
+                hero.score += crabFirstLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (crabSecondLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, crabSecondLine[i].rec))
+            if (CheckCollisionRecs(heroShoot.rec, crabSecondLine[i].bounds))
             {
                 heroShoot.active = false;
                 crabSecondLine[i].active = false;
+                hero.score += crabSecondLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (squidFirstLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, squidFirstLine[i].rec))
+            if (CheckCollisionRecs(heroShoot.rec, squidFirstLine[i].bounds))
             {
                 heroShoot.active = false;
                 squidFirstLine[i].active = false;
+                hero.score += squidFirstLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (squidSecondLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, squidSecondLine[i].rec))
+            if (CheckCollisionRecs(heroShoot.rec, squidSecondLine[i].bounds))
             {
                 heroShoot.active = false;
                 squidSecondLine[i].active = false;
+                hero.score += squidSecondLine[i].value;
             }
     }
 }
@@ -316,67 +320,67 @@ void CheckEnemyCollision()
 void MoveEnemies()
 {
     bool moveEnemiesInYAxis = false;
-    if (octopus[9].rec.x >= screenWidth - 60)
+    if (octopus[9].bounds.x >= screenWidth - 125)
     {
         moveEnemiesToLeft = false;
         moveEnemiesInYAxis = true;
     }
-    if (octopus[0].rec.x <= 25)
+    if (octopus[0].bounds.x <= 25)
     {
         moveEnemiesToLeft = true;
         moveEnemiesInYAxis = true;
     }
 
-    const int xIncreaseFactor = 25;
+    const int xIncreaseFactor = 18.5;
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (!moveEnemiesInYAxis) octopus[i].rec.x += moveEnemiesToLeft ? octopus[i].speed.x : -octopus[i].speed.x;
+        if (!moveEnemiesInYAxis) octopus[i].bounds.x += moveEnemiesToLeft ? octopus[i].speed.x : -octopus[i].speed.x;
         else
             {
-            octopus[i].rec.y += octopus[i].speed.y;
+            octopus[i].bounds.y += octopus[i].speed.y;
             octopus[i].speed.x += octopus[i].speed.x / xIncreaseFactor;
-            octopus[i].rec.x += moveEnemiesToLeft ? 1 : -1;
+            octopus[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
 
-        if (!moveEnemiesInYAxis) crabFirstLine[i].rec.x += moveEnemiesToLeft ? crabFirstLine[i].speed.x : -crabFirstLine[i].speed.x;
+        if (!moveEnemiesInYAxis) crabFirstLine[i].bounds.x += moveEnemiesToLeft ? crabFirstLine[i].speed.x : -crabFirstLine[i].speed.x;
         else
         {
-            crabFirstLine[i].rec.y += crabFirstLine[i].speed.y;
+            crabFirstLine[i].bounds.y += crabFirstLine[i].speed.y;
             crabFirstLine[i].speed.x += crabFirstLine[i].speed.x / xIncreaseFactor;
-            crabFirstLine[i].rec.x += moveEnemiesToLeft ? 1 : -1;
+            crabFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (!moveEnemiesInYAxis) crabSecondLine[i].rec.x += moveEnemiesToLeft ? crabSecondLine[i].speed.x : -crabSecondLine[i].speed.x;
+        if (!moveEnemiesInYAxis) crabSecondLine[i].bounds.x += moveEnemiesToLeft ? crabSecondLine[i].speed.x : -crabSecondLine[i].speed.x;
         else
         {
-            crabSecondLine[i].rec.y += crabSecondLine[i].speed.y;
+            crabSecondLine[i].bounds.y += crabSecondLine[i].speed.y;
             crabSecondLine[i].speed.x += crabSecondLine[i].speed.x / xIncreaseFactor;
-            crabSecondLine[i].rec.x += moveEnemiesToLeft ? 1 : -1;
+            crabSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (!moveEnemiesInYAxis) squidFirstLine[i].rec.x += moveEnemiesToLeft ? squidFirstLine[i].speed.x : -squidFirstLine[i].speed.x;
+        if (!moveEnemiesInYAxis) squidFirstLine[i].bounds.x += moveEnemiesToLeft ? squidFirstLine[i].speed.x : -squidFirstLine[i].speed.x;
         else
         {
-            squidFirstLine[i].rec.y += squidFirstLine[i].speed.y;
+            squidFirstLine[i].bounds.y += squidFirstLine[i].speed.y;
             squidFirstLine[i].speed.x += squidFirstLine[i].speed.x / xIncreaseFactor;
-            squidFirstLine[i].rec.x += moveEnemiesToLeft ? 1 : -1;
+            squidFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
-        if (!moveEnemiesInYAxis) squidSecondLine[i].rec.x += moveEnemiesToLeft ? squidSecondLine[i].speed.x : -squidSecondLine[i].speed.x;
+        if (!moveEnemiesInYAxis) squidSecondLine[i].bounds.x += moveEnemiesToLeft ? squidSecondLine[i].speed.x : -squidSecondLine[i].speed.x;
         else
         {
-            squidSecondLine[i].rec.y += squidSecondLine[i].speed.y;
+            squidSecondLine[i].bounds.y += squidSecondLine[i].speed.y;
             squidSecondLine[i].speed.x += squidSecondLine[i].speed.x / xIncreaseFactor;
-            squidSecondLine[i].rec.x += moveEnemiesToLeft ? 1 : -1;
+            squidSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
 }

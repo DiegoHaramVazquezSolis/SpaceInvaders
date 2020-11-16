@@ -11,3 +11,4 @@ add_subdirectory(libs/raylib)
 add_executable(SpaceInvaders main.c)
 
 target_link_libraries(SpaceInvaders PRIVATE raylib)
+file(COPY "resources/" DESTINATION "resources/")
