@@ -181,8 +181,8 @@ CMakeFiles\SpaceInvaders.dir\clean:
 # Target rules for target libs/raylib/src/CMakeFiles/raylib_static.dir
 
 # All Build rule for target.
-libs\raylib\src\CMakeFiles\raylib_static.dir\all: libs\raylib\src\external\glfw\src\CMakeFiles\glfw_objlib.dir\all
 libs\raylib\src\CMakeFiles\raylib_static.dir\all: libs\raylib\src\external\glfw\src\CMakeFiles\glfw.dir\all
+libs\raylib\src\CMakeFiles\raylib_static.dir\all: libs\raylib\src\external\glfw\src\CMakeFiles\glfw_objlib.dir\all
 	$(MAKE) $(MAKESILENT) -f libs\raylib\src\CMakeFiles\raylib_static.dir\build.make /nologo -$(MAKEFLAGS) libs\raylib\src\CMakeFiles\raylib_static.dir\depend
 	$(MAKE) $(MAKESILENT) -f libs\raylib\src\CMakeFiles\raylib_static.dir\build.make /nologo -$(MAKEFLAGS) libs\raylib\src\CMakeFiles\raylib_static.dir\build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\diego\CLionProjects\SpaceInvaders\cmake-build-debug\CMakeFiles --progress-num=19,20,21,22,23,24,25,26 "Built target raylib_static"

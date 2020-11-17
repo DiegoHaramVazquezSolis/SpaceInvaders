@@ -5,7 +5,7 @@
 
 #include "raylib.h"
 
-#define PLAYER_MAX_LIFE  3
+#define PLAYER_MAX_LIVES 3
 #define HERO_HEIGHT      50
 #define HERO_WIDTH       100
 #define ENEMY_HEIGHT     40
@@ -16,6 +16,7 @@ typedef struct Hero {
     Rectangle rec;
     Vector2 speed;
     int score;
+    int lifes;
 } Hero;
 
 typedef struct Shoot {
@@ -91,8 +92,9 @@ void InitGame()
     hero.rec.height = HERO_HEIGHT;
     hero.rec.width = HERO_WIDTH;
     hero.rec.x = (float)screenWidth / 2;
-    hero.rec.y = (float)screenHeight - HERO_HEIGHT - 5;
+    hero.rec.y = (float)screenHeight - HERO_HEIGHT * 2 - 50;
     hero.score = 0;
+    hero.lifes = PLAYER_MAX_LIVES;
 
     // Init hero shoot
     heroShoot.color = RED;
@@ -247,6 +249,10 @@ void RenderSpaceInvaders(int algo)
     }
 
     DrawRectangleRec(hero.rec, GREEN);
+    for(int i = 0; i < hero.lifes; i++)
+    {
+        DrawRectangle(i * 100 + (i * 10) + 10, GetScreenHeight() - HERO_HEIGHT - 10, HERO_WIDTH, HERO_HEIGHT, GREEN);
+    }
 }
 
 void MovePlayer(bool positive)
