@@ -223,27 +223,27 @@ void UpdateGame()
     }
 }
 
-void RenderSpaceInvaders(int algo)
+void RenderSpaceInvaders()
 {
     DrawText(TextFormat("Score: %d", hero.score), 10, 25, 12, GREEN);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
-        if (octopus[i].active) DrawTexture(octopus[i].sprite, octopus[i].bounds.x, octopus[i].bounds.y , octopus[i].color);
+        if (octopus[i].active) DrawTexture(octopus[i].sprite, (int)octopus[i].bounds.x, (int)octopus[i].bounds.y , octopus[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
-        if (crabFirstLine[i].active) DrawTexture(crabFirstLine[i].sprite, crabFirstLine[i].bounds.x, crabFirstLine[i].bounds.y, crabFirstLine[i].color);
+        if (crabFirstLine[i].active) DrawTexture(crabFirstLine[i].sprite, (int)crabFirstLine[i].bounds.x, (int)crabFirstLine[i].bounds.y, crabFirstLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
-        if (crabSecondLine[i].active) DrawTexture(crabSecondLine[i].sprite, crabSecondLine[i].bounds.x, crabSecondLine[i].bounds.y, crabSecondLine[i].color);
+        if (crabSecondLine[i].active) DrawTexture(crabSecondLine[i].sprite, (int)crabSecondLine[i].bounds.x, (int)crabSecondLine[i].bounds.y, crabSecondLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
-        if (squidFirstLine[i].active) DrawTexture(squidFirstLine[i].sprite, squidFirstLine[i].bounds.x, squidFirstLine[i].bounds.y, squidFirstLine[i].color);
+        if (squidFirstLine[i].active) DrawTexture(squidFirstLine[i].sprite, (int)squidFirstLine[i].bounds.x, (int)squidFirstLine[i].bounds.y, squidFirstLine[i].color);
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
-        if (squidSecondLine[i].active) DrawTexture(squidSecondLine[i].sprite, squidSecondLine[i].bounds.x, squidSecondLine[i].bounds.y, squidSecondLine[i].color);
+        if (squidSecondLine[i].active) DrawTexture(squidSecondLine[i].sprite, (int)squidSecondLine[i].bounds.x, (int)squidSecondLine[i].bounds.y, squidSecondLine[i].color);
     }
 
     if (heroShoot.active)
@@ -268,7 +268,7 @@ void HeroShoot()
     if (!heroShoot.active)
     {
         heroShoot.active = true;
-        heroShoot.rec.x = hero.rec.x + HERO_WIDTH / 2;
+        heroShoot.rec.x = hero.rec.x + HERO_WIDTH / 2.f;
         heroShoot.rec.y = hero.rec.y - heroShoot.rec.height + 5;
     }
 }
@@ -329,7 +329,7 @@ void CheckEnemyCollision()
 void MoveEnemies()
 {
     bool moveEnemiesInYAxis = false;
-    if (octopus[9].bounds.x >= screenWidth - 125)
+    if (octopus[9].bounds.x >= (float)screenWidth - 125)
     {
         moveEnemiesToLeft = false;
         moveEnemiesInYAxis = true;
@@ -347,7 +347,7 @@ void MoveEnemies()
         else
             {
             octopus[i].bounds.y += octopus[i].speed.y;
-            octopus[i].speed.x += octopus[i].speed.x / xIncreaseFactor;
+            octopus[i].speed.x += octopus[i].speed.x / (float)xIncreaseFactor;
             octopus[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
@@ -358,7 +358,7 @@ void MoveEnemies()
         else
         {
             crabFirstLine[i].bounds.y += crabFirstLine[i].speed.y;
-            crabFirstLine[i].speed.x += crabFirstLine[i].speed.x / xIncreaseFactor;
+            crabFirstLine[i].speed.x += crabFirstLine[i].speed.x / (float)xIncreaseFactor;
             crabFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
@@ -368,7 +368,7 @@ void MoveEnemies()
         else
         {
             crabSecondLine[i].bounds.y += crabSecondLine[i].speed.y;
-            crabSecondLine[i].speed.x += crabSecondLine[i].speed.x / xIncreaseFactor;
+            crabSecondLine[i].speed.x += crabSecondLine[i].speed.x / (float)xIncreaseFactor;
             crabSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
@@ -378,7 +378,7 @@ void MoveEnemies()
         else
         {
             squidFirstLine[i].bounds.y += squidFirstLine[i].speed.y;
-            squidFirstLine[i].speed.x += squidFirstLine[i].speed.x / xIncreaseFactor;
+            squidFirstLine[i].speed.x += squidFirstLine[i].speed.x / (float)xIncreaseFactor;
             squidFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
@@ -388,7 +388,7 @@ void MoveEnemies()
         else
         {
             squidSecondLine[i].bounds.y += squidSecondLine[i].speed.y;
-            squidSecondLine[i].speed.x += squidSecondLine[i].speed.x / xIncreaseFactor;
+            squidSecondLine[i].speed.x += squidSecondLine[i].speed.x / (float)xIncreaseFactor;
             squidSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
         }
     }
