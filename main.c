@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
 
 #include "raylib.h"
 
@@ -11,6 +8,7 @@
 #define ENEMY_HEIGHT     40
 #define ENEMY_WIDTH      40
 #define ENEMIES_PER_LINE 10
+#define ENEMY_SHOOT_TIME 60
 
 typedef struct Hero {
     Rectangle rec;
@@ -36,6 +34,13 @@ typedef struct Invader {
     int value;
 } Invader;
 
+typedef struct InvaderShoot {
+    Rectangle rec;
+    Vector2 speed;
+    bool active;
+    Color color;
+} InvaderShoot;
+
 typedef struct EnemyShip {
     Rectangle rec;
     Vector2 speed;
@@ -60,11 +65,16 @@ void MovePlayer(bool positive);
 void HeroShoot();
 void CheckEnemyCollision();
 void MoveEnemies();
+void EnemyShoot();
+void CheckHeroCollision();
 
 Hero hero;
 Shoot heroShoot;
+InvaderShoot invaderShoot;
 bool moveEnemiesToLeft = true;
 bool pause = false;
+bool isUserDeath = false;
+int frame = 0;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
@@ -103,6 +113,12 @@ void InitGame()
     heroShoot.rec.width = 5.f;
     heroShoot.speed.y = 7.f;
     heroShoot.active = false;
+
+    // Init enemy shoot
+    invaderShoot.rec.height = 20.f;
+    invaderShoot.rec.width = 5.f;
+    invaderShoot.color = BLACK;
+    invaderShoot.speed.y = 7.f;
 
     int screenOffset = 100;
     int lineNumber = 0;
@@ -198,7 +214,7 @@ void UpdateGame()
 {
     if (IsKeyPressed('P')) pause = !pause;
 
-    if (!pause) {
+    if (!pause && !isUserDeath) {
         // Movement
         if (IsKeyDown(KEY_RIGHT)) MovePlayer(false);
         if (IsKeyDown(KEY_LEFT)) MovePlayer(true);
@@ -207,7 +223,8 @@ void UpdateGame()
         if (IsKeyDown(KEY_SPACE) && !heroShoot.active) HeroShoot();
 
         // Shoot displacement
-        if (heroShoot.active) {
+        if (heroShoot.active)
+        {
             heroShoot.rec.y = heroShoot.rec.y - heroShoot.speed.y;
 
             // The user is able to shoot only when the previous shoot
@@ -219,7 +236,25 @@ void UpdateGame()
             }
         }
 
+        if (invaderShoot.active)
+        {
+            invaderShoot.rec.y += invaderShoot.speed.y;
+
+            if (invaderShoot.rec.y >= (double)screenHeight) {
+                invaderShoot.active = false;
+                invaderShoot.rec.y = 0;
+            } else {
+                CheckHeroCollision();
+            }
+        }
+
+        EnemyShoot();
         MoveEnemies();
+    }
+    if (isUserDeath)
+    {
+        DrawText("Presiona \nbarra espaciadora \npara continuar", screenHeight/4, screenWidth/4, 100, GREEN);
+        if (hero.lives > 0 && IsKeyDown(KEY_SPACE)) isUserDeath = false;
     }
 }
 
@@ -251,8 +286,13 @@ void RenderSpaceInvaders()
         DrawRectangleRec(heroShoot.rec, heroShoot.color);
     }
 
+    if (invaderShoot.active)
+    {
+        DrawRectangleRec(invaderShoot.rec, invaderShoot.color);
+    }
+
     DrawRectangleRec(hero.rec, GREEN);
-    for(int i = 0; i < hero.lives; i++)
+    for(int i = 0; i < hero.lives - 1; i++)
     {
         DrawRectangle(i * 100 + (i * 10) + 10, GetScreenHeight() - HERO_HEIGHT - 10, HERO_WIDTH, HERO_HEIGHT, GREEN);
     }
@@ -390,6 +430,59 @@ void MoveEnemies()
             squidSecondLine[i].bounds.y += squidSecondLine[i].speed.y;
             squidSecondLine[i].speed.x += squidSecondLine[i].speed.x / (float)xIncreaseFactor;
             squidSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+        }
+    }
+}
+
+void EnemyShoot()
+{
+    if (!invaderShoot.active)
+    {
+        frame++;
+        if (frame >= ENEMY_SHOOT_TIME)
+        {
+            for (int i = 0; i < ENEMIES_PER_LINE; i++) {
+                Invader enemy;
+                enemy.active = false;
+                if (squidSecondLine[i].active)
+                {
+                    enemy = squidSecondLine[i];
+                } else if (squidFirstLine[i].active)
+                {
+                    enemy = squidFirstLine[i];
+                } else if (crabSecondLine[i].active)
+                {
+                    enemy = crabSecondLine[i];
+                } else if (crabFirstLine[i].active)
+                {
+                    enemy = crabFirstLine[i];
+                } else if (octopus[i].active)
+                {
+                    enemy = octopus[i];
+                }
+
+                if (enemy.active && enemy.pos.x >= hero.rec.x - (HERO_WIDTH / 2.f) && enemy.pos.x <= hero.rec.x + (HERO_WIDTH / 2.f))
+                {
+                    invaderShoot.rec.y = enemy.bounds.y + enemy.bounds.height;
+                    invaderShoot.rec.x = enemy.bounds.x + (enemy.bounds.width / 2.f);
+                    invaderShoot.active = true;
+                }
+            }
+        }
+    } else {
+        frame = 0;
+    }
+}
+
+void CheckHeroCollision()
+{
+    if (invaderShoot.active)
+    {
+        if (CheckCollisionRecs(invaderShoot.rec, hero.rec))
+        {
+            invaderShoot.active = false;
+            hero.lives--;
+            isUserDeath = true;
         }
     }
 }
