@@ -24,6 +24,11 @@ typedef struct Shoot {
     Color color;
 } Shoot;
 
+typedef struct Defense {
+    Rectangle structure[6];
+    bool active[6];
+} Defense;
+
 typedef struct Invader {
     Texture2D sprite;
     Rectangle bounds;
@@ -53,6 +58,7 @@ Invader crabFirstLine[ENEMIES_PER_LINE] = { 0 };
 Invader crabSecondLine[ENEMIES_PER_LINE] = { 0 };
 Invader squidFirstLine[ENEMIES_PER_LINE] = { 0 };
 Invader squidSecondLine[ENEMIES_PER_LINE] = { 0 };
+Defense defenses[3];
 
 const int screenWidth = 1200;
 const int screenHeight = 975;
@@ -66,7 +72,9 @@ void HeroShoot();
 void CheckEnemyCollision();
 void MoveEnemies();
 void EnemyShoot();
+void CheckDefenseCollision();
 void CheckHeroCollision();
+void RenderDefenses();
 
 Hero hero;
 Shoot heroShoot;
@@ -193,6 +201,40 @@ void InitGame()
         squidSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 1.5;
     }
 
+    // Init Defenses
+    for (int i = 0; i < 3; i++) {
+        defenses[i].active[0] = true;
+        defenses[i].active[1] = true;
+        defenses[i].active[2] = true;
+        defenses[i].active[3] = true;
+        defenses[i].active[4] = true;
+        defenses[i].active[5] = true;
+        defenses[i].structure[0].width = 35;
+        defenses[i].structure[0].height = 35;
+        defenses[i].structure[1].width = 35;
+        defenses[i].structure[1].height = 35;
+        defenses[i].structure[2].width = 35;
+        defenses[i].structure[2].height = 35;
+        defenses[i].structure[3].width = 35;
+        defenses[i].structure[3].height = 35;
+        defenses[i].structure[4].width = 35;
+        defenses[i].structure[4].height = 35;
+        defenses[i].structure[5].width = 35;
+        defenses[i].structure[5].height = 35;
+        defenses[i].structure[0].x = 100.f + 430.f * (float)i;
+        defenses[i].structure[0].y = (float)screenHeight - 250.f;
+        defenses[i].structure[1].x = 100.f + 430.f * (float)i;
+        defenses[i].structure[1].y = (float)screenHeight - 285.f;
+        defenses[i].structure[2].x = 135.f + 430.f * (float)i;
+        defenses[i].structure[2].y = (float)screenHeight - 285.f;
+        defenses[i].structure[3].x = 170.f + 430.f * (float)i;
+        defenses[i].structure[3].y = (float)screenHeight - 285.f;
+        defenses[i].structure[4].x = 205.f + 430.f * (float)i;
+        defenses[i].structure[4].y = (float)screenHeight - 285.f;
+        defenses[i].structure[5].x = 205.f + 430.f * (float)i;
+        defenses[i].structure[5].y = (float)screenHeight - 250.f;
+    }
+
     SetTargetFPS(60);
 }
 
@@ -240,6 +282,7 @@ void UpdateGame()
             }
         }
 
+        CheckDefenseCollision();
         EnemyShoot();
         MoveEnemies();
     }
@@ -282,6 +325,8 @@ void RenderSpaceInvaders()
     {
         DrawRectangleRec(invaderShoot.rec, invaderShoot.color);
     }
+
+    RenderDefenses();
 
     DrawRectangleRec(hero.rec, GREEN);
     for(int i = 0; i < hero.lives - 1; i++)
@@ -554,6 +599,47 @@ void CheckHeroCollision()
             invaderShoot.active = false;
             hero.lives--;
             isUserDeath = true;
+        }
+    }
+}
+
+void CheckDefenseCollision()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 6; j++) {
+            if (defenses[i].active[j])
+            {
+                if (heroShoot.active)
+                {
+                    if (CheckCollisionRecs(heroShoot.rec, defenses[i].structure[j]))
+                    {
+                        heroShoot.active = false;
+                        defenses[i].active[j] = false;
+                    }
+                }
+                if (invaderShoot.active)
+                {
+                    if (CheckCollisionRecs(invaderShoot.rec, defenses[i].structure[j]))
+                    {
+                        invaderShoot.active = false;
+                        defenses[i].active[j] = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void RenderDefenses()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 6; j++) {
+            if (defenses[i].active[j])
+            {
+                DrawRectangleRec(defenses[i].structure[j], GREEN);
+            }
         }
     }
 }
