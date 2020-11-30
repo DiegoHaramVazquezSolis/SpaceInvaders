@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/diego/CLionProjects/SpaceInvaders/libs/raylib
+# Install script for directory: C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/libs/raylib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/libs/raylib/src/cmake_install.cmake")
+  include("C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/cmake-build-debug/libs/raylib/src/cmake_install.cmake")
 
 endif()
 

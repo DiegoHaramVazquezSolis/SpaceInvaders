@@ -6,8 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/raylib_static.dir/text.c.obj"
   "CMakeFiles/raylib_static.dir/textures.c.obj"
   "CMakeFiles/raylib_static.dir/utils.c.obj"
-  "raylib_static.lib"
-  "raylib_static.pdb"
+  "libraylib.a"
+  "libraylib.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

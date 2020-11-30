@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/diego/CLionProjects/SpaceInvaders/libs/raylib/src/external/glfw/src
+# Install script for directory: C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/libs/raylib/src/external/glfw/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

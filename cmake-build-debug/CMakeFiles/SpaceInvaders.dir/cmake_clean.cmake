@@ -2,8 +2,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/SpaceInvaders.dir/main.c.obj"
   "SpaceInvaders.exe"
   "SpaceInvaders.exe.manifest"
-  "SpaceInvaders.lib"
   "SpaceInvaders.pdb"
+  "libSpaceInvaders.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

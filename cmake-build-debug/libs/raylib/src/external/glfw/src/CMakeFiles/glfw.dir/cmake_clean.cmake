@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "glfw3.lib"
-  "glfw3.pdb"
+  "libglfw3.a"
+  "libglfw3.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/diego/CLionProjects/SpaceInvaders/main.c
+C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/main.c
 stdio.h
 -
 stdlib.h
@@ -16,7 +16,7 @@ time.h
 math.h
 -
 raylib.h
-C:/Users/diego/CLionProjects/SpaceInvaders/raylib.h
+C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/raylib.h
 
 libs/raylib/src/raylib.h
 stdarg.h

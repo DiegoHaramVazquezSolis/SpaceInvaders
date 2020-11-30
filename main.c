@@ -11,6 +11,7 @@
 #define ENEMY_HEIGHT     40
 #define ENEMY_WIDTH      40
 #define ENEMIES_PER_LINE 10
+#define recPos 325
 
 typedef struct Hero {
     Rectangle rec;
@@ -48,6 +49,7 @@ Invader crabFirstLine[ENEMIES_PER_LINE] = { 0 };
 Invader crabSecondLine[ENEMIES_PER_LINE] = { 0 };
 Invader squidFirstLine[ENEMIES_PER_LINE] = { 0 };
 Invader squidSecondLine[ENEMIES_PER_LINE] = { 0 };
+Invader squidPointer[1] = { 0 };
 
 const int screenWidth = 1400;
 const int screenHeight = 900;
@@ -60,10 +62,14 @@ void MovePlayer(bool positive);
 void HeroShoot();
 void CheckEnemyCollision();
 void MoveEnemies();
+void Menu();
 
 Hero hero;
 Shoot heroShoot;
 bool moveEnemiesToLeft = true;
+bool pause = 0;
+bool menu = 0;
+int add=0;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
@@ -193,36 +199,47 @@ void ExecuteGameLoop()
     RenderSpaceInvaders();
 }
 
-void UpdateGame()
-{
-    // Movement
-    if (IsKeyDown(KEY_RIGHT)) MovePlayer(false);
-    if (IsKeyDown(KEY_LEFT)) MovePlayer(true);
+void UpdateGame() {
+    // Pause and menu
+    if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_M)) pause = !pause;
+    if (IsKeyPressed(KEY_M)) menu = !menu;
 
-    // Actions
-    if (IsKeyDown(KEY_SPACE) && !heroShoot.active) HeroShoot();
+    // Pause
+    if (pause) DrawText(TextFormat("GAME PAUSED"), 600, 860, 40, DARKBLUE);
 
-    // Shoot displacement
-    if (heroShoot.active)
-    {
-        heroShoot.rec.y = heroShoot.rec.y - heroShoot.speed.y;
+    // Save game
+    //if (IsKeyPressed(KEY_S)) SaveFileData(game,  game.exe,  8);
+    //if (IsKeyPressed(KEY_L)) LoadFileData(const c,  8);
 
-        // The user is able to shoot only when the previous shoot
-        // collides with an enemy or "collides" with the end of the screen
-        if (heroShoot.rec.y < 0) {
-            heroShoot.active = false;
-        } else
-        {
-            CheckEnemyCollision();
+    if (!pause) {
+        // Movement
+        if (IsKeyDown(KEY_RIGHT)) MovePlayer(false);
+        if (IsKeyDown(KEY_LEFT)) MovePlayer(true);
+
+        // Actions
+        if (IsKeyDown(KEY_SPACE) && !heroShoot.active) HeroShoot();
+
+        // Shoot displacement
+        if (heroShoot.active) {
+            heroShoot.rec.y = heroShoot.rec.y - heroShoot.speed.y;
+
+            // The user is able to shoot only when the previous shoot
+            // collides with an enemy or "collides" with the end of the screen
+            if (heroShoot.rec.y < 0) {
+                heroShoot.active = false;
+            } else {
+                CheckEnemyCollision();
+            }
         }
-    }
 
-    MoveEnemies();
+        MoveEnemies();
+    }
 }
 
 void RenderSpaceInvaders(int algo)
 {
     DrawText(TextFormat("Score: %d", hero.score), 10, 25, 12, GREEN);
+    DrawText(TextFormat("PRESS M TO GO TO MENU"), 1100, 880, 20, GRAY);
     for (int i = 0; i < ENEMIES_PER_LINE; ++i) {
         if (octopus[i].active) DrawTexture(octopus[i].sprite, octopus[i].bounds.x, octopus[i].bounds.y , octopus[i].color);
     }
@@ -247,6 +264,31 @@ void RenderSpaceInvaders(int algo)
     {
         DrawRectangleRec(heroShoot.rec, heroShoot.color);
     }
+
+    //int Pos = Pos + add;
+    if (menu) {
+        if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
+        if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
+            /*if (add < 40) add=0;
+            else if (add > 40 && add < 80) add=40;
+            else  add=80;*/
+
+
+
+        DrawRectangleRec(hero.rec, GREEN);
+        DrawRectangle(500, 315, 400, 270, BLACK);
+        DrawRectangle(510, 325+add, 350, 60, GRAY);
+        DrawText(TextFormat("-> SAVE GAME"), 520, 335, 40, WHITE);
+        DrawText(TextFormat("-> LOAD GAME"), 520, 415, 40, WHITE);
+        DrawText(TextFormat("-> RESUME"), 520, 495, 40, WHITE);
+        //DrawText(TextFormat("PRESS M TO RESUME"), 520,730 , 30, WHITE);
+
+        // Select resume in menu
+        if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
+            menu = 0;
+            pause = 0;
+            }
+        }
 
     DrawRectangleRec(hero.rec, GREEN);
     for(int i = 0; i < hero.lifes; i++)
