@@ -47,6 +47,13 @@ typedef struct EnemyShip {
     int value;
 } EnemyShip;
 
+typedef struct MenuOption {
+    char *text;
+    Vector2 pos;
+} MenuOption;
+
+MenuOption options[3];
+
 Invader *octopus;
 Invader *crabFirstLine;
 Invader *crabSecondLine;
@@ -731,10 +738,6 @@ void SaveGame()
 void LoadGame()
 {
     Invader enemies[50];
-    Shoot invShoot;
-    Hero hero1;
-    Shoot hShoot;
-    Defense def[3];
     FILE *file = fopen("Enemies.bin", "rb");
     if (file != NULL)
     {
