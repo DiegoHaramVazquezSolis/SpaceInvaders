@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "raylib.h"
 
@@ -255,7 +256,7 @@ void UpdateGame()
     if (IsKeyPressed(KEY_M)) menu = !menu;
 
     // Pause text
-    if (pause) DrawText(TextFormat("GAME PAUSED"), 600, 860, 40, DARKBLUE);
+    if (pause) DrawText(TextFormat("GAME PAUSED"), screenWidth / 2 - 150, screenHeight - 50, 40, DARKBLUE);
 
     if (!pause && !menu && !isUserDeath) {
         // Movement
@@ -661,9 +662,6 @@ void RenderMenu()
     if (menu) {
         if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
         if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
-        /*if (add < 40) add=0;
-        else if (add > 40 && add < 80) add=40;
-        else  add=80;*/
 
         DrawRectangleRec(hero.rec, GREEN);
         DrawRectangle(500, 315, 400, 270, BLACK);
@@ -675,8 +673,46 @@ void RenderMenu()
 
         // Select resume in menu
         if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
-            menu = 0;
-            pause = 0;
+            SaveGame();
         }
     }
+}
+
+void SaveGame()
+{
+    char gameToSave[51];
+    int j = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        Invader *enemy;
+        switch (i) {
+            case 0:
+                enemy = octopus;
+                break;
+            case 1:
+                enemy = crabFirstLine;
+                break;
+            case 2:
+                enemy = crabSecondLine;
+                break;
+            case 3:
+                enemy = squidFirstLine;
+                break;
+            case 4:
+                enemy = squidSecondLine;
+                break;
+            default:
+                break;
+        }
+        for (; j < ENEMIES_PER_LINE * (i+1); j++)
+        {
+            gameToSave[j] = enemy->active ? '1' : '0';
+            enemy++;
+        }
+    }
+
+
+
+    gameToSave[50] = '\0';
+    SaveFileText("LastGame.txt", gameToSave);
 }
