@@ -75,6 +75,8 @@ void EnemyShoot();
 void CheckDefenseCollision();
 void CheckHeroCollision();
 void RenderDefenses();
+void RenderMenu();
+void SaveGame();
 
 Hero hero;
 Shoot heroShoot;
@@ -82,6 +84,8 @@ InvaderShoot invaderShoot;
 bool moveEnemiesToLeft = true;
 bool pause = false;
 bool isUserDeath = false;
+bool menu = false;
+int add = 0;
 int frame = 0;
 
 int main() {
@@ -246,9 +250,14 @@ void ExecuteGameLoop()
 
 void UpdateGame()
 {
-    if (IsKeyPressed('P')) pause = !pause;
+    // Check if it is pause or menu
+    if (IsKeyPressed(KEY_P)) pause = !pause;
+    if (IsKeyPressed(KEY_M)) menu = !menu;
 
-    if (!pause && !isUserDeath) {
+    // Pause text
+    if (pause) DrawText(TextFormat("GAME PAUSED"), 600, 860, 40, DARKBLUE);
+
+    if (!pause && !menu && !isUserDeath) {
         // Movement
         if (IsKeyDown(KEY_RIGHT)) MovePlayer(false);
         if (IsKeyDown(KEY_LEFT)) MovePlayer(true);
@@ -296,6 +305,7 @@ void UpdateGame()
 void RenderSpaceInvaders()
 {
     DrawText(TextFormat("Score: %d", hero.score), 10, 5, 24, GREEN);
+    DrawText(TextFormat("PRESS M TO GO TO MENU"), 1100, 880, 20, GRAY);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active) DrawTexture(octopus[i].sprite, (int)octopus[i].bounds.x, (int)octopus[i].bounds.y , octopus[i].color);
     }
@@ -333,6 +343,8 @@ void RenderSpaceInvaders()
     {
         DrawRectangle(i * 100 + (i * 10) + 10, GetScreenHeight() - HERO_HEIGHT - 10, HERO_WIDTH, HERO_HEIGHT, GREEN);
     }
+
+    RenderMenu();
 }
 
 void MovePlayer(bool positive)
@@ -640,6 +652,31 @@ void RenderDefenses()
             {
                 DrawRectangleRec(defenses[i].structure[j], GREEN);
             }
+        }
+    }
+}
+
+void RenderMenu()
+{
+    if (menu) {
+        if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
+        if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
+        /*if (add < 40) add=0;
+        else if (add > 40 && add < 80) add=40;
+        else  add=80;*/
+
+        DrawRectangleRec(hero.rec, GREEN);
+        DrawRectangle(500, 315, 400, 270, BLACK);
+        DrawRectangle(510, 325+add, 350, 60, GRAY);
+        DrawText(TextFormat("-> SAVE GAME"), 520, 335, 40, WHITE);
+        DrawText(TextFormat("-> LOAD GAME"), 520, 415, 40, WHITE);
+        DrawText(TextFormat("-> RESUME"), 520, 495, 40, WHITE);
+        //DrawText(TextFormat("PRESS M TO RESUME"), 520,730 , 30, WHITE);
+
+        // Select resume in menu
+        if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
+            menu = 0;
+            pause = 0;
         }
     }
 }
