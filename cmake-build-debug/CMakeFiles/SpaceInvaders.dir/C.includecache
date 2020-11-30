@@ -11,6 +11,8 @@ stdio.h
 -
 string.h
 -
+stdlib.h
+-
 raylib.h
 C:/Users/diego/CLionProjects/SpaceInvaders/raylib.h
 

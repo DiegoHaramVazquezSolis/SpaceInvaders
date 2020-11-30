@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "raylib.h"
 
@@ -78,6 +79,7 @@ void CheckHeroCollision();
 void RenderDefenses();
 void RenderMenu();
 void SaveGame();
+void LoadGame();
 
 Hero hero;
 Shoot heroShoot;
@@ -673,14 +675,15 @@ void RenderMenu()
 
         // Select resume in menu
         if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
-            SaveGame();
+            //SaveGame();
+            LoadGame();
         }
     }
 }
 
 void SaveGame()
 {
-    char gameToSave[51];
+    Invader gameToSave[50];
     int j = 0;
     for (int i = 0; i < 5; i++)
     {
@@ -704,15 +707,63 @@ void SaveGame()
             default:
                 break;
         }
+        int ref = 0;
         for (; j < ENEMIES_PER_LINE * (i+1); j++)
         {
-            gameToSave[j] = enemy->active ? '1' : '0';
-            enemy++;
+            gameToSave[j] = enemy[ref];
+            ref++;
         }
     }
 
+    FILE *fileW = fopen("Enemies.bin", "wb");
+    fwrite(gameToSave, sizeof(struct Invader), 50, fileW);
+    fwrite(&invaderShoot, sizeof(struct InvaderShoot), 1, fileW);
+    fwrite(&hero, sizeof(struct Hero), 1, fileW);
+    fwrite(&heroShoot, sizeof(struct Shoot), 1, fileW);
+    fwrite(&defenses, sizeof(struct Defense), 3, fileW);
+    fclose(fileW);
+}
 
+void LoadGame()
+{
+    Invader enemies[50];
+    InvaderShoot invShoot;
+    Hero hero1;
+    Shoot hShoot;
+    Defense def[3];
+    FILE *file = fopen("Enemies.bin", "rb");
+    if (file != NULL)
+    {
+        for (int i = 0; i < 50; ++i)
+        {
+            fread(&enemies[i], sizeof(struct Invader), 1, file);
+        }
 
-    gameToSave[50] = '\0';
-    SaveFileText("LastGame.txt", gameToSave);
+        fread(&invShoot, sizeof(struct InvaderShoot), 1, file);
+        invaderShoot = invShoot;
+
+        int j = 0;
+        for (int i = 0; i < 50; i++) {
+            if (j == 10) j = 0;
+            if (i < 10) octopus[j] = enemies[i];
+            else if (i < 20) squidFirstLine[j] = enemies[i];
+            else if (i < 30) squidSecondLine[j] = enemies[i];
+            else if (i < 40) crabFirstLine[j] = enemies[i];
+            else crabSecondLine[j] = enemies[i];
+            j++;
+        }
+
+        fread(&hero1, sizeof(struct Hero), 1, file);
+        hero = hero1;
+
+        fread(&hShoot, sizeof(struct Shoot), 1, file);
+        heroShoot = hShoot;
+
+        for (int i = 0; i < 3; ++i) {
+            fread(&def[i], sizeof(struct Defense), 1, file);
+            defenses[i] = def[i];
+        }
+
+        fclose(file);
+    }
 }
