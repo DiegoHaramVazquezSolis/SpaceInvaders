@@ -9,8 +9,6 @@
 C:/Users/diego/CLionProjects/SpaceInvaders/main.c
 stdio.h
 -
-string.h
--
 stdlib.h
 -
 raylib.h

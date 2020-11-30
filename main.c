@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include "raylib.h"
@@ -41,13 +40,6 @@ typedef struct Invader {
     int value;
 } Invader;
 
-typedef struct InvaderShoot {
-    Rectangle rec;
-    Vector2 speed;
-    bool active;
-    Color color;
-} InvaderShoot;
-
 typedef struct EnemyShip {
     Rectangle rec;
     Vector2 speed;
@@ -55,12 +47,12 @@ typedef struct EnemyShip {
     int value;
 } EnemyShip;
 
-Invader octopus[ENEMIES_PER_LINE] = { 0 };
-Invader crabFirstLine[ENEMIES_PER_LINE] = { 0 };
-Invader crabSecondLine[ENEMIES_PER_LINE] = { 0 };
-Invader squidFirstLine[ENEMIES_PER_LINE] = { 0 };
-Invader squidSecondLine[ENEMIES_PER_LINE] = { 0 };
-Defense defenses[3];
+Invader *octopus;
+Invader *crabFirstLine;
+Invader *crabSecondLine;
+Invader *squidFirstLine;
+Invader *squidSecondLine;
+Defense *defenses;
 
 const int screenWidth = 1200;
 const int screenHeight = 975;
@@ -80,10 +72,11 @@ void RenderDefenses();
 void RenderMenu();
 void SaveGame();
 void LoadGame();
+void FreeGameMemory();
 
-Hero hero;
-Shoot heroShoot;
-InvaderShoot invaderShoot;
+Hero *hero;
+Shoot *heroShoot;
+Shoot *invaderShoot;
 bool moveEnemiesToLeft = true;
 bool pause = false;
 bool isUserDeath = false;
@@ -106,6 +99,7 @@ int main() {
         EndDrawing();
     }
 
+    FreeGameMemory();
     CloseWindow();
 
     return 0;
@@ -113,33 +107,38 @@ int main() {
 
 void InitGame()
 {
+    hero = malloc(sizeof(struct Hero));
     // Init hero
-    hero.speed.x = -2.f;
-    hero.rec.height = HERO_HEIGHT;
-    hero.rec.width = HERO_WIDTH;
-    hero.rec.x = (float)screenWidth / 2;
-    hero.rec.y = (float)screenHeight - HERO_HEIGHT * 2 - 50;
-    hero.score = 0;
-    hero.lives = PLAYER_MAX_LIVES;
+    hero->speed.x = -2.f;
+    hero->rec.height = HERO_HEIGHT;
+    hero->rec.width = HERO_WIDTH;
+    hero->rec.x = (float)screenWidth / 2;
+    hero->rec.y = (float)screenHeight - HERO_HEIGHT * 2 - 50;
+    hero->score = 0;
+    hero->lives = PLAYER_MAX_LIVES;
 
+    heroShoot = malloc(sizeof(struct Shoot));
     // Init hero shoot
-    heroShoot.color = RED;
-    heroShoot.rec.height = 20.f;
-    heroShoot.rec.width = 5.f;
-    heroShoot.speed.y = 7.f;
-    heroShoot.active = false;
+    heroShoot->color = RED;
+    heroShoot->rec.height = 20.f;
+    heroShoot->rec.width = 5.f;
+    heroShoot->speed.y = 7.f;
+    heroShoot->active = false;
 
+    invaderShoot = malloc(sizeof(struct Shoot));
     // Init enemy shoot
-    invaderShoot.rec.height = 20.f;
-    invaderShoot.rec.width = 5.f;
-    invaderShoot.color = BLACK;
-    invaderShoot.speed.y = 7.f;
+    invaderShoot->rec.height = 20.f;
+    invaderShoot->rec.width = 5.f;
+    invaderShoot->color = BLACK;
+    invaderShoot->speed.y = 7.f;
+    invaderShoot->active = false;
 
     int screenOffset = 75;
     int lineNumber = 1;
 
     Texture2D octopusTexture = LoadTexture("resources/Octopus.png");
 
+    octopus =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     // Init Octopus array
     Invader defaultOctopus = {
         .active = true,
@@ -159,6 +158,7 @@ void InitGame()
 
     Texture2D crabTexture = LoadTexture("resources/Crab.png");
 
+    crabFirstLine =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     // Init Crab array
     Invader defaultCrab = {
         .active = true,
@@ -176,6 +176,7 @@ void InitGame()
     }
     lineNumber++;
 
+    crabSecondLine =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         crabSecondLine[i] = defaultCrab;
         crabSecondLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
@@ -195,6 +196,7 @@ void InitGame()
         .value = 10
     };
 
+    squidFirstLine =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         squidFirstLine[i] = defaultSquid;
         squidFirstLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
@@ -202,12 +204,14 @@ void InitGame()
     }
     lineNumber++;
 
+    squidSecondLine =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         squidSecondLine[i] = defaultSquid;
         squidSecondLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
         squidSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 1.5;
     }
 
+    defenses = malloc(sizeof(Defense) * 3);
     // Init Defenses
     for (int i = 0; i < 3; i++) {
         defenses[i].active[0] = true;
@@ -266,29 +270,29 @@ void UpdateGame()
         if (IsKeyDown(KEY_LEFT)) MovePlayer(true);
 
         // Actions
-        if (IsKeyDown(KEY_SPACE) && !heroShoot.active) HeroShoot();
+        if (IsKeyDown(KEY_SPACE) && !heroShoot->active) HeroShoot();
 
         // Shoot displacement
-        if (heroShoot.active)
+        if (heroShoot->active)
         {
-            heroShoot.rec.y = heroShoot.rec.y - heroShoot.speed.y;
+            heroShoot->rec.y = heroShoot->rec.y - heroShoot->speed.y;
 
             // The user is able to shoot only when the previous shoot
             // collides with an enemy or "collides" with the end of the screen
-            if (heroShoot.rec.y < 0) {
-                heroShoot.active = false;
+            if (heroShoot->rec.y < 0) {
+                heroShoot->active = false;
             } else {
                 CheckEnemyCollision();
             }
         }
 
-        if (invaderShoot.active)
+        if (invaderShoot->active)
         {
-            invaderShoot.rec.y += invaderShoot.speed.y;
+            invaderShoot->rec.y += invaderShoot->speed.y;
 
-            if (invaderShoot.rec.y >= (double)screenHeight) {
-                invaderShoot.active = false;
-                invaderShoot.rec.y = 0;
+            if (invaderShoot->rec.y >= (double)screenHeight) {
+                invaderShoot->active = false;
+                invaderShoot->rec.y = 0;
             } else {
                 CheckHeroCollision();
             }
@@ -301,13 +305,13 @@ void UpdateGame()
     if (isUserDeath)
     {
         DrawText("Presiona \nbarra espaciadora \npara continuar", screenHeight / 4, screenWidth / 4, 100, GREEN);
-        if (hero.lives > 0 && IsKeyDown(KEY_SPACE)) isUserDeath = false;
+        if (hero->lives > 0 && IsKeyDown(KEY_SPACE)) isUserDeath = false;
     }
 }
 
 void RenderSpaceInvaders()
 {
-    DrawText(TextFormat("Score: %d", hero.score), 10, 5, 24, GREEN);
+    DrawText(TextFormat("Score: %d", hero->score), 10, 5, 24, GREEN);
     DrawText(TextFormat("PRESS M TO GO TO MENU"), 1100, 880, 20, GRAY);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active) DrawTexture(octopus[i].sprite, (int)octopus[i].bounds.x, (int)octopus[i].bounds.y , octopus[i].color);
@@ -329,20 +333,20 @@ void RenderSpaceInvaders()
         if (squidSecondLine[i].active) DrawTexture(squidSecondLine[i].sprite, (int)squidSecondLine[i].bounds.x, (int)squidSecondLine[i].bounds.y, squidSecondLine[i].color);
     }
 
-    if (heroShoot.active)
+    if (heroShoot->active)
     {
-        DrawRectangleRec(heroShoot.rec, heroShoot.color);
+        DrawRectangleRec(heroShoot->rec, heroShoot->color);
     }
 
-    if (invaderShoot.active)
+    if (invaderShoot->active)
     {
-        DrawRectangleRec(invaderShoot.rec, invaderShoot.color);
+        DrawRectangleRec(invaderShoot->rec, invaderShoot->color);
     }
 
     RenderDefenses();
 
-    DrawRectangleRec(hero.rec, GREEN);
-    for(int i = 0; i < hero.lives - 1; i++)
+    DrawRectangleRec(hero->rec, GREEN);
+    for(int i = 0; i < hero->lives - 1; i++)
     {
         DrawRectangle(i * 100 + (i * 10) + 10, GetScreenHeight() - HERO_HEIGHT - 10, HERO_WIDTH, HERO_HEIGHT, GREEN);
     }
@@ -352,16 +356,16 @@ void RenderSpaceInvaders()
 
 void MovePlayer(bool positive)
 {
-    hero.rec.x += positive ? hero.speed.x : -hero.speed.x;
+    hero->rec.x += positive ? hero->speed.x : -hero->speed.x;
 }
 
 void HeroShoot()
 {
-    if (!heroShoot.active)
+    if (!heroShoot->active)
     {
-        heroShoot.active = true;
-        heroShoot.rec.x = hero.rec.x + HERO_WIDTH / 2.f;
-        heroShoot.rec.y = hero.rec.y - heroShoot.rec.height + 5;
+        heroShoot->active = true;
+        heroShoot->rec.x = hero->rec.x + HERO_WIDTH / 2.f;
+        heroShoot->rec.y = hero->rec.y - heroShoot->rec.height + 5;
     }
 }
 
@@ -369,51 +373,51 @@ void CheckEnemyCollision()
 {
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, octopus[i].bounds))
+            if (CheckCollisionRecs(heroShoot->rec, octopus[i].bounds))
             {
-                heroShoot.active = false;
+                heroShoot->active = false;
                 octopus[i].active = false;
-                hero.score += octopus[i].value;
+                hero->score += octopus[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (crabFirstLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, crabFirstLine[i].bounds))
+            if (CheckCollisionRecs(heroShoot->rec, crabFirstLine[i].bounds))
             {
-                heroShoot.active = false;
+                heroShoot->active = false;
                 crabFirstLine[i].active = false;
-                hero.score += crabFirstLine[i].value;
+                hero->score += crabFirstLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (crabSecondLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, crabSecondLine[i].bounds))
+            if (CheckCollisionRecs(heroShoot->rec, crabSecondLine[i].bounds))
             {
-                heroShoot.active = false;
+                heroShoot->active = false;
                 crabSecondLine[i].active = false;
-                hero.score += crabSecondLine[i].value;
+                hero->score += crabSecondLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (squidFirstLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, squidFirstLine[i].bounds))
+            if (CheckCollisionRecs(heroShoot->rec, squidFirstLine[i].bounds))
             {
-                heroShoot.active = false;
+                heroShoot->active = false;
                 squidFirstLine[i].active = false;
-                hero.score += squidFirstLine[i].value;
+                hero->score += squidFirstLine[i].value;
             }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (squidSecondLine[i].active)
-            if (CheckCollisionRecs(heroShoot.rec, squidSecondLine[i].bounds))
+            if (CheckCollisionRecs(heroShoot->rec, squidSecondLine[i].bounds))
             {
-                heroShoot.active = false;
+                heroShoot->active = false;
                 squidSecondLine[i].active = false;
-                hero.score += squidSecondLine[i].value;
+                hero->score += squidSecondLine[i].value;
             }
     }
 }
@@ -567,7 +571,7 @@ void MoveEnemies()
 
 void EnemyShoot()
 {
-    if (!invaderShoot.active)
+    if (!invaderShoot->active)
     {
         frame++;
         if (frame >= ENEMY_SHOOT_TIME)
@@ -592,11 +596,11 @@ void EnemyShoot()
                     enemy = octopus[i];
                 }
 
-                if (enemy.active && enemy.bounds.x >= hero.rec.x - (HERO_WIDTH / 2.f) && enemy.bounds.x <= hero.rec.x + (HERO_WIDTH / 2.f))
+                if (enemy.active && enemy.bounds.x >= hero->rec.x - (HERO_WIDTH / 2.f) && enemy.bounds.x <= hero->rec.x + (HERO_WIDTH / 2.f))
                 {
-                    invaderShoot.rec.y = enemy.bounds.y + enemy.bounds.height;
-                    invaderShoot.rec.x = enemy.bounds.x + (enemy.bounds.width / 2.f);
-                    invaderShoot.active = true;
+                    invaderShoot->rec.y = enemy.bounds.y + enemy.bounds.height;
+                    invaderShoot->rec.x = enemy.bounds.x + (enemy.bounds.width / 2.f);
+                    invaderShoot->active = true;
                 }
             }
         }
@@ -607,12 +611,12 @@ void EnemyShoot()
 
 void CheckHeroCollision()
 {
-    if (invaderShoot.active)
+    if (invaderShoot->active)
     {
-        if (CheckCollisionRecs(invaderShoot.rec, hero.rec))
+        if (CheckCollisionRecs(invaderShoot->rec, hero->rec))
         {
-            invaderShoot.active = false;
-            hero.lives--;
+            invaderShoot->active = false;
+            hero->lives--;
             isUserDeath = true;
         }
     }
@@ -625,19 +629,19 @@ void CheckDefenseCollision()
         for (int j = 0; j < 6; j++) {
             if (defenses[i].active[j])
             {
-                if (heroShoot.active)
+                if (heroShoot->active)
                 {
-                    if (CheckCollisionRecs(heroShoot.rec, defenses[i].structure[j]))
+                    if (CheckCollisionRecs(heroShoot->rec, defenses[i].structure[j]))
                     {
-                        heroShoot.active = false;
+                        heroShoot->active = false;
                         defenses[i].active[j] = false;
                     }
                 }
-                if (invaderShoot.active)
+                if (invaderShoot->active)
                 {
-                    if (CheckCollisionRecs(invaderShoot.rec, defenses[i].structure[j]))
+                    if (CheckCollisionRecs(invaderShoot->rec, defenses[i].structure[j]))
                     {
-                        invaderShoot.active = false;
+                        invaderShoot->active = false;
                         defenses[i].active[j] = false;
                     }
                 }
@@ -665,7 +669,7 @@ void RenderMenu()
         if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
         if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
 
-        DrawRectangleRec(hero.rec, GREEN);
+        DrawRectangleRec(hero->rec, GREEN);
         DrawRectangle(500, 315, 400, 270, BLACK);
         DrawRectangle(510, 325+add, 350, 60, GRAY);
         DrawText(TextFormat("-> SAVE GAME"), 520, 335, 40, WHITE);
@@ -717,17 +721,17 @@ void SaveGame()
 
     FILE *fileW = fopen("Enemies.bin", "wb");
     fwrite(gameToSave, sizeof(struct Invader), 50, fileW);
-    fwrite(&invaderShoot, sizeof(struct InvaderShoot), 1, fileW);
-    fwrite(&hero, sizeof(struct Hero), 1, fileW);
-    fwrite(&heroShoot, sizeof(struct Shoot), 1, fileW);
-    fwrite(&defenses, sizeof(struct Defense), 3, fileW);
+    fwrite(invaderShoot, sizeof(struct Shoot), 1, fileW);
+    fwrite(hero, sizeof(struct Hero), 1, fileW);
+    fwrite(heroShoot, sizeof(struct Shoot), 1, fileW);
+    fwrite(defenses, sizeof(struct Defense), 3, fileW);
     fclose(fileW);
 }
 
 void LoadGame()
 {
     Invader enemies[50];
-    InvaderShoot invShoot;
+    Shoot invShoot;
     Hero hero1;
     Shoot hShoot;
     Defense def[3];
@@ -739,8 +743,7 @@ void LoadGame()
             fread(&enemies[i], sizeof(struct Invader), 1, file);
         }
 
-        fread(&invShoot, sizeof(struct InvaderShoot), 1, file);
-        invaderShoot = invShoot;
+        fread(invaderShoot, sizeof(struct Shoot), 1, file);
 
         int j = 0;
         for (int i = 0; i < 50; i++) {
@@ -753,17 +756,24 @@ void LoadGame()
             j++;
         }
 
-        fread(&hero1, sizeof(struct Hero), 1, file);
-        hero = hero1;
+        fread(hero, sizeof(struct Hero), 1, file);
 
-        fread(&hShoot, sizeof(struct Shoot), 1, file);
-        heroShoot = hShoot;
+        fread(heroShoot, sizeof(struct Shoot), 1, file);
 
         for (int i = 0; i < 3; ++i) {
-            fread(&def[i], sizeof(struct Defense), 1, file);
-            defenses[i] = def[i];
+            fread(&defenses[i], sizeof(struct Defense), 1, file);
         }
 
         fclose(file);
     }
+}
+
+void FreeGameMemory()
+{
+    free(octopus);
+    free(crabFirstLine);
+    free(crabSecondLine);
+    free(squidFirstLine);
+    free(squidSecondLine);
+    free(defenses);
 }
