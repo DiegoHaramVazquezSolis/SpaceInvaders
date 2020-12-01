@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Users/diego/CLionProjects/SpaceInvaders/main.c" "C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/CMakeFiles/SpaceInvaders.dir/main.c.obj"
+  "C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/main.c" "C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/cmake-build-debug/CMakeFiles/SpaceInvaders.dir/main.c.obj"
   )
-set(CMAKE_C_COMPILER_ID "MSVC")
+set(CMAKE_C_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_C
@@ -23,8 +23,8 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/libs/raylib/src/CMakeFiles/raylib_static.dir/DependInfo.cmake"
-  "C:/Users/diego/CLionProjects/SpaceInvaders/cmake-build-debug/libs/raylib/src/external/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"
+  "C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/cmake-build-debug/libs/raylib/src/CMakeFiles/raylib_static.dir/DependInfo.cmake"
+  "C:/Users/Edson Montelongo/Documents/GitHub/SpaceInvaders/cmake-build-debug/libs/raylib/src/external/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

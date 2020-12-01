@@ -7,7 +7,7 @@ Name: raylib
 Description: Simple and easy-to-use library to enjoy videogames programming
 URL: http://github.com/raysan5/raylib
 Version: 3.0.0
-Libs: -L"${libdir}" -lraylib -lwinmm  -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32
-Libs.private: -lwinmm  -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32 -lgdi32
+Libs: -L"${libdir}" -lraylib -lwinmm  -lgdi32
+Libs.private: -lwinmm  -lgdi32
 Requires.private: 
 Cflags: -I"${includedir}"

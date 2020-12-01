@@ -55,6 +55,11 @@ typedef struct EnemyShip {
     int value;
 } EnemyShip;
 
+typedef struct MenuOption {
+    char *text;
+    Vector2 pos;
+} MenuOption;
+
 Invader octopus[ENEMIES_PER_LINE] = { 0 };
 Invader crabFirstLine[ENEMIES_PER_LINE] = { 0 };
 Invader crabSecondLine[ENEMIES_PER_LINE] = { 0 };
@@ -80,14 +85,19 @@ void RenderDefenses();
 void RenderMenu();
 void SaveGame();
 void LoadGame();
-
+void ResumeGame();
+void WordBox();
 Hero hero;
 Shoot heroShoot;
 InvaderShoot invaderShoot;
+
+
 bool moveEnemiesToLeft = true;
 bool pause = false;
 bool isUserDeath = false;
 bool menu = false;
+bool count = false;
+
 int add = 0;
 int frame = 0;
 
@@ -308,7 +318,7 @@ void UpdateGame()
 void RenderSpaceInvaders()
 {
     DrawText(TextFormat("Score: %d", hero.score), 10, 5, 24, GREEN);
-    DrawText(TextFormat("PRESS M TO GO TO MENU"), 1100, 880, 20, GRAY);
+    DrawText(TextFormat("PRESS M TO GO TO MENU"), screenWidth-300, screenHeight-30, 20, GRAY);
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active) DrawTexture(octopus[i].sprite, (int)octopus[i].bounds.x, (int)octopus[i].bounds.y , octopus[i].color);
     }
@@ -662,10 +672,34 @@ void RenderDefenses()
 void RenderMenu()
 {
     if (menu) {
-        if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
-        if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
-
         DrawRectangleRec(hero.rec, GREEN);
+
+        char *menuLetters[] = {"-> SAVE GAME", "-> LOAD GAME", "-> RESUME"};
+        MenuOption menuOp[strlen((const char *) menuLetters)];
+        int pos = (screenHeight/2)-125+(add*40);
+
+        DrawRectangle((screenWidth/2)-200, (screenHeight/2)-135, 400, 270, BLACK);
+        DrawRectangle((screenWidth/2)-180, (screenHeight/2)-125+(add*40), 350, 40, GRAY);
+
+        if(IsKeyReleased((KEY_UP))) add--;
+        if(IsKeyReleased((KEY_DOWN))) add++;
+        printf("add: %d", add);
+
+        for(int i=0; i<strlen((const char *) menuLetters); i++) {
+            menuOp[i].text = menuLetters[i];
+            menuOp[i].pos.x = (screenWidth/2)-180;
+            menuOp[i].pos.y = (screenHeight/2)-125+(i*40);
+            DrawText(menuOp[i].text, menuOp[i].pos.x, menuOp[i].pos.y, 40, WHITE);
+        }
+
+
+        if((pos == ((screenHeight/2)-125+(0*40))) && (IsKeyDown(KEY_ENTER))) SaveGame();
+        if((pos == ((screenHeight/2)-125+(1*40))) && (IsKeyDown(KEY_ENTER))) LoadGame();
+        if((pos == ((screenHeight/2)-125+(2*40))) && (IsKeyDown(KEY_ENTER))) ResumeGame();
+
+
+
+/*
         DrawRectangle(500, 315, 400, 270, BLACK);
         DrawRectangle(510, 325+add, 350, 60, GRAY);
         DrawText(TextFormat("-> SAVE GAME"), 520, 335, 40, WHITE);
@@ -677,7 +711,7 @@ void RenderMenu()
         if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
             //SaveGame();
             LoadGame();
-        }
+        }*/
     }
 }
 
@@ -766,4 +800,12 @@ void LoadGame()
 
         fclose(file);
     }
+}
+
+void ResumeGame() {
+    menu = !menu;
+}
+
+void WordBox() {
+
 }
