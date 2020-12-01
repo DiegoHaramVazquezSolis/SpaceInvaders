@@ -96,6 +96,9 @@ bool isUserDeath = false;
 bool menu = false;
 bool moveMothershipToLeft = true;
 bool allEnemiesAreDeath;
+Texture2D octopusTexture;
+Texture2D crabTexture;
+Texture2D squidTexture;
 
 int add = 0;
 int frame = 0;
@@ -105,6 +108,9 @@ int currentLevel = 0;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
+    octopusTexture = LoadTexture("resources/Octopus.png");
+    crabTexture = LoadTexture("resources/Crab.png");
+    squidTexture = LoadTexture("resources/Squid.png");
     InitGame(true);
 
     enemyShipTime = rand() % (70-61) + 60;
@@ -163,8 +169,6 @@ void InitGame(bool firstGame)
     int screenOffset = 75;
     int lineNumber = 1;
 
-    Texture2D octopusTexture = LoadTexture("resources/Octopus.png");
-
     octopus =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     // Init Octopus array
     Invader defaultOctopus = {
@@ -182,8 +186,6 @@ void InitGame(bool firstGame)
         octopus[i].bounds.y = ENEMY_HEIGHT * lineNumber * 1.25;
     }
     lineNumber++;
-
-    Texture2D crabTexture = LoadTexture("resources/Crab.png");
 
     crabFirstLine =  malloc(sizeof(Invader) * ENEMIES_PER_LINE);
     // Init Crab array
@@ -210,8 +212,6 @@ void InitGame(bool firstGame)
         crabSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 1.4;
     }
     lineNumber++;
-
-    Texture2D squidTexture = LoadTexture("resources/Squid.png");
 
     // Init Squid array
     Invader defaultSquid = {
@@ -383,6 +383,7 @@ void UpdateGame()
 void RenderSpaceInvaders()
 {
     DrawText(TextFormat("Score: %d", hero->score), 10, 5, 24, GREEN);
+    DrawText(TextFormat("Level: %d", currentLevel + 1), screenWidth - 100, 5, 24, GREEN);
     DrawText(TextFormat("PRESS M TO GO TO MENU"), screenWidth-300, screenHeight-30, 20, GRAY);
 
     if (mothership->active) DrawTexture(mothership->sprite, (int)mothership->bounds.x, (int)mothership->bounds.y, WHITE);
@@ -833,6 +834,7 @@ void SaveGame()
     fwrite(hero, sizeof(struct Hero), 1, fileW);
     fwrite(heroShoot, sizeof(struct Shoot), 1, fileW);
     fwrite(defenses, sizeof(struct Defense), 3, fileW);
+    fwrite(&currentLevel, sizeof(int), 3, fileW);
     fclose(fileW);
 }
 
@@ -864,9 +866,11 @@ void LoadGame()
 
         fread(heroShoot, sizeof(struct Shoot), 1, file);
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; i++) {
             fread(&defenses[i], sizeof(struct Defense), 1, file);
         }
+
+        fread(&currentLevel, sizeof(int), 1, file);
 
         fclose(file);
     }
@@ -912,6 +916,7 @@ void MothershipLogic()
         }
     }
 }
+
 void ResumeGame() {
     menu = !menu;
 }
