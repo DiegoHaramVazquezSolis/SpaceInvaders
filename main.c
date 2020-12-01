@@ -95,14 +95,17 @@ bool pause = false;
 bool isUserDeath = false;
 bool menu = false;
 bool moveMothershipToLeft = true;
+bool allEnemiesAreDeath;
+
 int add = 0;
 int frame = 0;
 int frameForEnemyShip = 0;
 int enemyShipTime = 0;
+int currentLevel = 0;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
-    InitGame();
+    InitGame(true);
 
     enemyShipTime = rand() % (70-61) + 60;
 
@@ -123,25 +126,31 @@ int main() {
     return 0;
 }
 
-void InitGame()
+void InitGame(bool firstGame)
 {
-    hero = malloc(sizeof(struct Hero));
-    // Init hero
-    hero->speed.x = -2.f;
-    hero->rec.height = HERO_HEIGHT;
-    hero->rec.width = HERO_WIDTH;
-    hero->rec.x = (float)screenWidth / 2;
-    hero->rec.y = (float)screenHeight - HERO_HEIGHT * 2 - 50;
-    hero->score = 0;
-    hero->lives = PLAYER_MAX_LIVES;
+    if (!firstGame) currentLevel++;
+    else currentLevel = 0;
 
-    heroShoot = malloc(sizeof(struct Shoot));
-    // Init hero shoot
-    heroShoot->color = RED;
-    heroShoot->rec.height = 20.f;
-    heroShoot->rec.width = 5.f;
-    heroShoot->speed.y = 7.f;
-    heroShoot->active = false;
+    if (firstGame)
+    {
+        hero = malloc(sizeof(struct Hero));
+        // Init hero
+        hero->speed.x = -2.f;
+        hero->rec.height = HERO_HEIGHT;
+        hero->rec.width = HERO_WIDTH;
+        hero->rec.x = (float)screenWidth / 2;
+        hero->rec.y = (float)screenHeight - HERO_HEIGHT * 2 - 50;
+        hero->score = 0;
+        hero->lives = PLAYER_MAX_LIVES;
+
+        heroShoot = malloc(sizeof(struct Shoot));
+        // Init hero shoot
+        heroShoot->color = RED;
+        heroShoot->rec.height = 20.f;
+        heroShoot->rec.width = 5.f;
+        heroShoot->speed.y = 7.f;
+        heroShoot->active = false;
+    }
 
     invaderShoot = malloc(sizeof(struct Shoot));
     // Init enemy shoot
@@ -161,7 +170,7 @@ void InitGame()
     Invader defaultOctopus = {
         .active = true,
         .color = PINK,
-        .speed = { .x = 1.5f, .y = (float) ENEMY_HEIGHT / 2 },
+        .speed = { .x = 1.5f + currentLevel, .y = (float) ENEMY_HEIGHT / 2 },
         .sprite = octopusTexture,
         .bounds = { .height = 32, .width = 48 },
         .value = 30
@@ -181,7 +190,7 @@ void InitGame()
     Invader defaultCrab = {
         .active = true,
         .color = SKYBLUE,
-        .speed = { .x = 1.5f, .y = (float) ENEMY_HEIGHT / 2 },
+        .speed = { .x = 1.5f + currentLevel, .y = (float) ENEMY_HEIGHT / 2 },
         .sprite = crabTexture,
         .bounds = { .height = 32, .width = 48 },
         .value = 20
@@ -208,7 +217,7 @@ void InitGame()
     Invader defaultSquid = {
         .active = true,
         .color = GREEN,
-        .speed = { .x = 1.5f, .y = (float) ENEMY_HEIGHT / 2 },
+        .speed = { .x = 1.5f + currentLevel, .y = (float) ENEMY_HEIGHT / 2 },
         .sprite = squidTexture,
         .bounds = { .height = 32, .width = 48 },
         .value = 10
@@ -228,6 +237,8 @@ void InitGame()
         squidSecondLine[i].bounds.x = ENEMY_WIDTH + screenOffset * ( i + 1);
         squidSecondLine[i].bounds.y = ENEMY_HEIGHT * lineNumber * 1.5;
     }
+
+    allEnemiesAreDeath = false;
 
     defenses = malloc(sizeof(Defense) * 3);
     // Init Defenses
@@ -347,6 +358,8 @@ void UpdateGame()
         EnemyShoot();
         MothershipLogic();
         MoveEnemies();
+
+        if (allEnemiesAreDeath) InitGame(false);
     }
     if (isUserDeath)
     {
@@ -360,7 +373,7 @@ void UpdateGame()
             DrawText("Insert coin to continue\n (press R)", screenHeight / 5, screenWidth / 4 + 150, 80, GREEN);
             if (IsKeyDown(KEY_R))
             {
-                InitGame();
+                InitGame(true);
                 isUserDeath = false;
             }
         }
@@ -491,10 +504,12 @@ void CheckEnemyCollision()
 void MoveEnemies()
 {
     bool moveEnemiesInYAxis = false;
+    allEnemiesAreDeath = true;
     for(int i = 9; i >= 0; i--)
     {
         if (octopus[i].active)
         {
+            allEnemiesAreDeath = false;
             if (octopus[i].bounds.x >= (float) screenWidth - 50)
             {
                 moveEnemiesToLeft = false;
@@ -504,6 +519,7 @@ void MoveEnemies()
         }
         if (crabFirstLine[i].active)
         {
+            allEnemiesAreDeath = false;
             if (crabFirstLine[i].bounds.x >= (float) screenWidth - 50)
             {
                 moveEnemiesToLeft = false;
@@ -513,6 +529,7 @@ void MoveEnemies()
         }
         if (crabSecondLine[i].active)
         {
+            allEnemiesAreDeath = false;
             if (crabSecondLine[i].bounds.x >= (float) screenWidth - 50)
             {
                 moveEnemiesToLeft = false;
@@ -522,6 +539,7 @@ void MoveEnemies()
         }
         if (squidFirstLine[i].active)
         {
+            allEnemiesAreDeath = false;
             if (squidFirstLine[i].bounds.x >= (float) screenWidth - 50)
             {
                 moveEnemiesToLeft = false;
@@ -531,6 +549,7 @@ void MoveEnemies()
         }
         if (squidSecondLine[i].active)
         {
+            allEnemiesAreDeath = false;
             if (squidSecondLine[i].bounds.x >= (float) screenWidth - 50)
             {
                 moveEnemiesToLeft = false;
