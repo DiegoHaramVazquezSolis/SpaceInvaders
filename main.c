@@ -453,52 +453,62 @@ void CheckEnemyCollision()
 {
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active)
+        {
             if (CheckCollisionRecs(heroShoot->rec, octopus[i].bounds))
             {
                 heroShoot->active = false;
                 octopus[i].active = false;
                 hero->score += octopus[i].value;
             }
+        }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (crabFirstLine[i].active)
+        {
             if (CheckCollisionRecs(heroShoot->rec, crabFirstLine[i].bounds))
             {
                 heroShoot->active = false;
                 crabFirstLine[i].active = false;
                 hero->score += crabFirstLine[i].value;
             }
+        }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (crabSecondLine[i].active)
+        {
             if (CheckCollisionRecs(heroShoot->rec, crabSecondLine[i].bounds))
             {
                 heroShoot->active = false;
                 crabSecondLine[i].active = false;
                 hero->score += crabSecondLine[i].value;
             }
+        }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (squidFirstLine[i].active)
+        {
             if (CheckCollisionRecs(heroShoot->rec, squidFirstLine[i].bounds))
             {
                 heroShoot->active = false;
                 squidFirstLine[i].active = false;
                 hero->score += squidFirstLine[i].value;
             }
+        }
     }
 
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (squidSecondLine[i].active)
+        {
             if (CheckCollisionRecs(heroShoot->rec, squidSecondLine[i].bounds))
             {
                 heroShoot->active = false;
                 squidSecondLine[i].active = false;
                 hero->score += squidSecondLine[i].value;
             }
+        }
     }
 }
 
@@ -614,6 +624,7 @@ void MoveEnemies()
             {
             octopus[i].bounds.y += octopus[i].speed.y;
             octopus[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+            if (octopus[i].active && octopus[i].bounds.y >= defenses[2].structure[3].y - ENEMY_HEIGHT - 35) printf("Muerto");
         }
     }
 
@@ -624,6 +635,7 @@ void MoveEnemies()
         {
             crabFirstLine[i].bounds.y += crabFirstLine[i].speed.y;
             crabFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+            if (crabFirstLine[i].active && crabFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
         }
     }
 
@@ -633,6 +645,7 @@ void MoveEnemies()
         {
             crabSecondLine[i].bounds.y += crabSecondLine[i].speed.y;
             crabSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+            if (crabSecondLine[i].active && crabSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
         }
     }
 
@@ -642,6 +655,7 @@ void MoveEnemies()
         {
             squidFirstLine[i].bounds.y += squidFirstLine[i].speed.y;
             squidFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+            if (squidFirstLine[i].active && squidFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
         }
     }
 
@@ -651,6 +665,7 @@ void MoveEnemies()
         {
             squidSecondLine[i].bounds.y += squidSecondLine[i].speed.y;
             squidSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
+            if (squidSecondLine[i].active && squidSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
         }
     }
 }
