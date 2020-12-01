@@ -796,7 +796,7 @@ void RenderMenu()
         if(IsKeyReleased((KEY_UP)) && add > 0) add--;
         if(IsKeyReleased((KEY_DOWN)) && add < 3) add++;
 
-        for(int i=0; i < strlen((const char *) menuLetters); i++) {
+        for(int i = 0; i < 3; i++) {
             menuOp[i].text = menuLetters[i];
             menuOp[i].pos.x = ((float)screenWidth/2)-180;
             menuOp[i].pos.y = ((float)screenHeight/2)-125+((float)i*40);
