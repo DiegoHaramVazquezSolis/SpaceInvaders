@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "raylib.h"
 
@@ -33,7 +34,6 @@ typedef struct Defense {
 typedef struct Invader {
     Texture2D sprite;
     Rectangle bounds;
-    Vector2 pos;
     Vector2 speed;
     bool active;
     Color color;
@@ -41,7 +41,8 @@ typedef struct Invader {
 } Invader;
 
 typedef struct EnemyShip {
-    Rectangle rec;
+    Texture2D sprite;
+    Rectangle bounds;
     Vector2 speed;
     bool active;
     int value;
@@ -80,20 +81,30 @@ void RenderMenu();
 void SaveGame();
 void LoadGame();
 void FreeGameMemory();
+void MothershipLogic();
+void ResumeGame();
 
 Hero *hero;
 Shoot *heroShoot;
 Shoot *invaderShoot;
+Shoot *mothsershipShoot;
+EnemyShip *mothership;
+
 bool moveEnemiesToLeft = true;
 bool pause = false;
 bool isUserDeath = false;
 bool menu = false;
+bool moveMothershipToLeft = true;
 int add = 0;
 int frame = 0;
+int frameForEnemyShip = 0;
+int enemyShipTime = 0;
 
 int main() {
     InitWindow(screenWidth, screenHeight, "Space Invaders");
     InitGame();
+
+    enemyShipTime = rand() % (70-61) + 60;
 
     while (!WindowShouldClose())
     {
@@ -253,6 +264,24 @@ void InitGame()
         defenses[i].structure[5].y = (float)screenHeight - 250.f;
     }
 
+    // Init mothership
+    mothership = malloc(sizeof(EnemyShip));
+    mothership->sprite = LoadTexture("resources/EnemyShip.png");
+    mothership->active = false;
+    mothership->bounds.y = 10;
+    mothership->bounds.height = 32;
+    mothership->bounds.width = 48;
+    mothership->speed.x = 4.f;
+    mothership->value = 0;
+
+    // Init mothership shoot
+    mothsershipShoot = malloc(sizeof(Shoot));
+    mothsershipShoot->active = false;
+    mothsershipShoot->speed.y = 10.f;
+    mothsershipShoot->rec.width = 8.f;
+    mothsershipShoot->rec.height = 20.f;
+    mothsershipShoot->color = GREEN;
+
     SetTargetFPS(60);
 }
 
@@ -305,21 +334,46 @@ void UpdateGame()
             }
         }
 
+        if (mothsershipShoot->active)
+        {
+            mothsershipShoot->rec.y += mothsershipShoot->speed.y;
+            if (mothsershipShoot->rec.y >= (double)screenHeight) {
+                mothsershipShoot->active = false;
+                mothsershipShoot->rec.y = 35;
+            }
+        }
+
         CheckDefenseCollision();
         EnemyShoot();
+        MothershipLogic();
         MoveEnemies();
     }
     if (isUserDeath)
     {
-        DrawText("Presiona \nbarra espaciadora \npara continuar", screenHeight / 4, screenWidth / 4, 100, GREEN);
-        if (hero->lives > 0 && IsKeyDown(KEY_SPACE)) isUserDeath = false;
+        if (hero->lives > 0)
+        {
+            DrawText("Presiona \nbarra espaciadora \npara continuar", screenHeight / 4, screenWidth / 4, 100, GREEN);
+            if (IsKeyDown(KEY_SPACE)) isUserDeath = false;
+        }
+        else {
+            DrawText("Game over", screenHeight / 4, screenWidth / 4, 100, RED);
+            DrawText("Insert coin to continue\n (press R)", screenHeight / 5, screenWidth / 4 + 150, 80, GREEN);
+            if (IsKeyDown(KEY_R))
+            {
+                InitGame();
+                isUserDeath = false;
+            }
+        }
     }
 }
 
 void RenderSpaceInvaders()
 {
     DrawText(TextFormat("Score: %d", hero->score), 10, 5, 24, GREEN);
-    DrawText(TextFormat("PRESS M TO GO TO MENU"), 1100, 880, 20, GRAY);
+    DrawText(TextFormat("PRESS M TO GO TO MENU"), screenWidth-300, screenHeight-30, 20, GRAY);
+
+    if (mothership->active) DrawTexture(mothership->sprite, (int)mothership->bounds.x, (int)mothership->bounds.y, WHITE);
+
     for (int i = 0; i < ENEMIES_PER_LINE; i++) {
         if (octopus[i].active) DrawTexture(octopus[i].sprite, (int)octopus[i].bounds.x, (int)octopus[i].bounds.y , octopus[i].color);
     }
@@ -348,6 +402,11 @@ void RenderSpaceInvaders()
     if (invaderShoot->active)
     {
         DrawRectangleRec(invaderShoot->rec, invaderShoot->color);
+    }
+
+    if (mothsershipShoot->active)
+    {
+        DrawRectangleRec(mothsershipShoot->rec, mothsershipShoot->color);
     }
 
     RenderDefenses();
@@ -627,13 +686,23 @@ void CheckHeroCollision()
             isUserDeath = true;
         }
     }
+    if (mothsershipShoot->active)
+    {
+        if (CheckCollisionRecs(mothsershipShoot->rec, hero->rec))
+        {
+            mothsershipShoot->active = false;
+            hero->lives--;
+            isUserDeath = true;
+        }
+    }
 }
 
 void CheckDefenseCollision()
 {
     for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 6; j++) {
+        for (int j = 0; j < 6; j++)
+        {
             if (defenses[i].active[j])
             {
                 if (heroShoot->active)
@@ -649,6 +718,14 @@ void CheckDefenseCollision()
                     if (CheckCollisionRecs(invaderShoot->rec, defenses[i].structure[j]))
                     {
                         invaderShoot->active = false;
+                        defenses[i].active[j] = false;
+                    }
+                }
+                if (mothsershipShoot->active)
+                {
+                    if (CheckCollisionRecs(mothsershipShoot->rec, defenses[i].structure[j]))
+                    {
+                        mothsershipShoot->active = false;
                         defenses[i].active[j] = false;
                     }
                 }
@@ -673,22 +750,27 @@ void RenderDefenses()
 void RenderMenu()
 {
     if (menu) {
-        if ((325+add < 465) && (IsKeyDown(KEY_DOWN))) add = add + 40;
-        if ((325+add > 325) && (IsKeyDown(KEY_UP))) add = add - 40;
-
         DrawRectangleRec(hero->rec, GREEN);
-        DrawRectangle(500, 315, 400, 270, BLACK);
-        DrawRectangle(510, 325+add, 350, 60, GRAY);
-        DrawText(TextFormat("-> SAVE GAME"), 520, 335, 40, WHITE);
-        DrawText(TextFormat("-> LOAD GAME"), 520, 415, 40, WHITE);
-        DrawText(TextFormat("-> RESUME"), 520, 495, 40, WHITE);
-        //DrawText(TextFormat("PRESS M TO RESUME"), 520,730 , 30, WHITE);
+        char *menuLetters[] = {"-> SAVE GAME", "-> LOAD GAME", "-> RESUME"};
+        MenuOption menuOp[3];
+        int pos = (screenHeight/2)-125+(add*40);
 
-        // Select resume in menu
-        if((325+add >= 405) && (IsKeyDown(KEY_ENTER))) {
-            //SaveGame();
-            LoadGame();
+        DrawRectangle((screenWidth/2)-200, (screenHeight/2)-135, 400, 270, BLACK);
+        DrawRectangle((screenWidth/2)-180, (screenHeight/2)-125+(add*40), 350, 40, GRAY);
+
+        if(IsKeyReleased((KEY_UP)) && add > 0) add--;
+        if(IsKeyReleased((KEY_DOWN)) && add < 3) add++;
+
+        for(int i=0; i < strlen((const char *) menuLetters); i++) {
+            menuOp[i].text = menuLetters[i];
+            menuOp[i].pos.x = ((float)screenWidth/2)-180;
+            menuOp[i].pos.y = ((float)screenHeight/2)-125+((float)i*40);
+            DrawText(menuOp[i].text, (int)menuOp[i].pos.x, (int)menuOp[i].pos.y, 40, WHITE);
         }
+
+        if((pos == ((screenHeight/2)-125+(0*40))) && (IsKeyDown(KEY_ENTER))) SaveGame();
+        if((pos == ((screenHeight/2)-125+(1*40))) && (IsKeyDown(KEY_ENTER))) LoadGame();
+        if((pos == ((screenHeight/2)-125+(2*40))) && (IsKeyDown(KEY_ENTER))) ResumeGame();
     }
 }
 
@@ -746,8 +828,6 @@ void LoadGame()
             fread(&enemies[i], sizeof(struct Invader), 1, file);
         }
 
-        fread(invaderShoot, sizeof(struct Shoot), 1, file);
-
         int j = 0;
         for (int i = 0; i < 50; i++) {
             if (j == 10) j = 0;
@@ -758,6 +838,8 @@ void LoadGame()
             else crabSecondLine[j] = enemies[i];
             j++;
         }
+
+        fread(invaderShoot, sizeof(struct Shoot), 1, file);
 
         fread(hero, sizeof(struct Hero), 1, file);
 
@@ -779,4 +861,38 @@ void FreeGameMemory()
     free(squidFirstLine);
     free(squidSecondLine);
     free(defenses);
+}
+
+void MothershipLogic()
+{
+    if (!mothership->active)
+    {
+        frameForEnemyShip++;
+        if (frame >= enemyShipTime)
+        {
+            mothership->active = true;
+        }
+        mothership->bounds.x = moveMothershipToLeft ? 0 : (float)screenWidth - 50;
+    } else
+    {
+        frameForEnemyShip = 0;
+        mothership->bounds.x += moveMothershipToLeft ? mothership->speed.x : -mothership->speed.x;
+        if (mothership->bounds.x >= hero->rec.x - (HERO_WIDTH / 2.f) && mothership->bounds.x <= hero->rec.x + (HERO_WIDTH / 2.f))
+        {
+            mothsershipShoot->rec.x = mothership->bounds.x + 20;
+            mothsershipShoot->rec.y = 35 + mothership->bounds.y;
+            mothsershipShoot->active = true;
+        } else if (mothership->bounds.x >= (float) screenWidth - 50)
+        {
+            mothership->active = false;
+            moveMothershipToLeft = false;
+        } else if (mothership->bounds.x <= 0)
+        {
+            mothership->active = false;
+            moveMothershipToLeft = true;
+        }
+    }
+}
+void ResumeGame() {
+    menu = !menu;
 }
