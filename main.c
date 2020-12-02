@@ -624,7 +624,11 @@ void MoveEnemies()
             {
             octopus[i].bounds.y += octopus[i].speed.y;
             octopus[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
-            if (octopus[i].active && octopus[i].bounds.y >= defenses[2].structure[3].y - ENEMY_HEIGHT - 35) printf("Muerto");
+            if (octopus[i].active && octopus[i].bounds.y >= defenses[2].structure[3].y - ENEMY_HEIGHT - 35)
+            {
+                hero->lives = 0;
+                isUserDeath = true;
+            }
         }
     }
 
@@ -635,7 +639,11 @@ void MoveEnemies()
         {
             crabFirstLine[i].bounds.y += crabFirstLine[i].speed.y;
             crabFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
-            if (crabFirstLine[i].active && crabFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
+            if (crabFirstLine[i].active && crabFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35)
+            {
+                hero->lives = 0;
+                isUserDeath = true;
+            }
         }
     }
 
@@ -645,7 +653,11 @@ void MoveEnemies()
         {
             crabSecondLine[i].bounds.y += crabSecondLine[i].speed.y;
             crabSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
-            if (crabSecondLine[i].active && crabSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
+            if (crabSecondLine[i].active && crabSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 20)
+            {
+                hero->lives = 0;
+                isUserDeath = true;
+            }
         }
     }
 
@@ -655,7 +667,11 @@ void MoveEnemies()
         {
             squidFirstLine[i].bounds.y += squidFirstLine[i].speed.y;
             squidFirstLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
-            if (squidFirstLine[i].active && squidFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
+            if (squidFirstLine[i].active && squidFirstLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 20)
+            {
+                hero->lives = 0;
+                isUserDeath = true;
+            }
         }
     }
 
@@ -665,7 +681,11 @@ void MoveEnemies()
         {
             squidSecondLine[i].bounds.y += squidSecondLine[i].speed.y;
             squidSecondLine[i].bounds.x += moveEnemiesToLeft ? 1 : -1;
-            if (squidSecondLine[i].active && squidSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 35) printf("Muerto");
+            if (squidSecondLine[i].active && squidSecondLine[i].bounds.y >= defenses[2].structure[2].y - ENEMY_HEIGHT - 20)
+            {
+                hero->lives = 0;
+                isUserDeath = true;
+            }
         }
     }
 }
