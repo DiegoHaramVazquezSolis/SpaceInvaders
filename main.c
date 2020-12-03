@@ -46,6 +46,7 @@ typedef struct EnemyShip {
     Vector2 speed;
     bool active;
     int value;
+    bool isEnemyShipDestroyed;
 } EnemyShip;
 
 typedef struct MenuOption {
@@ -284,6 +285,7 @@ void InitGame(bool firstGame)
     mothership->bounds.width = 48;
     mothership->speed.x = 4.f;
     mothership->value = 0;
+    mothership->isEnemyShipDestroyed = false;
 
     // Init mothership shoot
     mothsershipShoot = malloc(sizeof(Shoot));
@@ -508,6 +510,16 @@ void CheckEnemyCollision()
                 squidSecondLine[i].active = false;
                 hero->score += squidSecondLine[i].value;
             }
+        }
+    }
+    if (mothership->active)
+    {
+        if (CheckCollisionRecs(heroShoot->rec, mothership->bounds))
+        {
+            heroShoot->active = false;
+            mothership->active = false;
+            mothership->isEnemyShipDestroyed = true;
+            hero->score += rand() % (100 - 61) + 60;
         }
     }
 }
@@ -923,31 +935,34 @@ void FreeGameMemory()
 
 void MothershipLogic()
 {
-    if (!mothership->active)
+    if (!mothership->isEnemyShipDestroyed)
     {
-        frameForEnemyShip++;
-        if (frame >= enemyShipTime)
+        if (!mothership->active)
         {
-            mothership->active = true;
-        }
-        mothership->bounds.x = moveMothershipToLeft ? 0 : (float)screenWidth - 50;
-    } else
-    {
-        frameForEnemyShip = 0;
-        mothership->bounds.x += moveMothershipToLeft ? mothership->speed.x : -mothership->speed.x;
-        if (mothership->bounds.x >= hero->rec.x - (HERO_WIDTH / 2.f) && mothership->bounds.x <= hero->rec.x + (HERO_WIDTH / 2.f))
+            frameForEnemyShip++;
+            if (frame >= enemyShipTime)
+            {
+                mothership->active = true;
+            }
+            mothership->bounds.x = moveMothershipToLeft ? 0 : (float)screenWidth - 50;
+        } else
         {
-            mothsershipShoot->rec.x = mothership->bounds.x + 20;
-            mothsershipShoot->rec.y = 35 + mothership->bounds.y;
-            mothsershipShoot->active = true;
-        } else if (mothership->bounds.x >= (float) screenWidth - 50)
-        {
-            mothership->active = false;
-            moveMothershipToLeft = false;
-        } else if (mothership->bounds.x <= 0)
-        {
-            mothership->active = false;
-            moveMothershipToLeft = true;
+            frameForEnemyShip = 0;
+            mothership->bounds.x += moveMothershipToLeft ? mothership->speed.x : -mothership->speed.x;
+            if (mothership->bounds.x >= hero->rec.x - (HERO_WIDTH / 2.f) && mothership->bounds.x <= hero->rec.x + (HERO_WIDTH / 2.f))
+            {
+                mothsershipShoot->rec.x = mothership->bounds.x + 20;
+                mothsershipShoot->rec.y = 35 + mothership->bounds.y;
+                mothsershipShoot->active = true;
+            } else if (mothership->bounds.x >= (float) screenWidth - 50)
+            {
+                mothership->active = false;
+                moveMothershipToLeft = false;
+            } else if (mothership->bounds.x <= 0)
+            {
+                mothership->active = false;
+                moveMothershipToLeft = true;
+            }
         }
     }
 }
