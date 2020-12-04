@@ -467,7 +467,7 @@ void RenderSpaceInvaders()
 // Function to move the player
 void MovePlayer(bool positive)
 {
-    hero->rec.x += positive ? hero->speed.x : -hero->speed.x;
+    hero->rec.x += positive ? hero->rec.x >= 0 ? hero->speed.x : 0 : hero->rec.x <= (float) screenWidth - hero->rec.width ? -hero->speed.x : 0;
 }
 
 // Active hero shoot
